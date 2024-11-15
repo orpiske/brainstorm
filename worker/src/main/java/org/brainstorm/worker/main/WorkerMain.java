@@ -86,7 +86,7 @@ public class WorkerMain implements Callable<Integer> {
         return new DependencyDownloaderClassLoader(parentCL);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         int exitCode = new CommandLine(new WorkerMain()).execute(args);
 
         System.exit(exitCode);
