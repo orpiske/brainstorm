@@ -35,7 +35,7 @@ public class WorkerMain implements Callable<Integer> {
     @CommandLine.Option(names = {"-p", "--bootstrap-server-port"}, description = "The Kafka bootstrap server port to use", defaultValue = "9092")
     private int bootstrapPort;
 
-   @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
+    @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
 
 
