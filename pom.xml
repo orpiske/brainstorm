@@ -19,6 +19,7 @@
         <module>parent</module>
         <module>api</module>
         <module>worker</module>
+        <module>service</module>
     </modules>
 
 </project>
