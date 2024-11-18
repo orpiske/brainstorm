@@ -23,6 +23,7 @@
 
     <modules>
         <module>camel-worker</module>
+        <module>runner-worker</module>
     </modules>
 
 </project>
