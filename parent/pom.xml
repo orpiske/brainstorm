@@ -9,6 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <name>Brainstorm :: Parent</name>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
 

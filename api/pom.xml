@@ -10,6 +10,7 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
+    <name>Brainstorm :: API</name>
     <artifactId>api</artifactId>
 
     <properties>
