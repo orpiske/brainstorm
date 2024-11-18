@@ -21,8 +21,6 @@ public class OnDataAcquiredHandlerRoute extends RouteBuilder {
     }
 
     private void exec(Exchange exchange) {
-        Runtime runtime = Runtime.getRuntime();
-
         final String body = exchange.getIn().getBody(String.class);
         LOG.info("Executing on data acquired handler: {}", body);
         try {
