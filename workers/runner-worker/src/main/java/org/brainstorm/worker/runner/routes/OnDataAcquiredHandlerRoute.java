@@ -1,7 +1,6 @@
 package org.brainstorm.worker.runner.routes;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.camel.Exchange;
@@ -30,6 +29,9 @@ public class OnDataAcquiredHandlerRoute extends RouteBuilder {
 
             final Process process = processBuilder.start();
             final int i = process.waitFor();
+            if (i != 0) {
+                LOG.warn("Transformation did not complete successfully");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
