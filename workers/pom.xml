@@ -22,6 +22,7 @@
     </properties>
 
     <modules>
+        <module>common</module>
         <module>camel-worker</module>
         <module>runner-worker</module>
     </modules>

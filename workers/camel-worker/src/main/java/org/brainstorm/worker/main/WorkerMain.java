@@ -15,6 +15,9 @@ import org.apache.camel.spi.ResourceLoader;
 import org.apache.camel.spi.RoutesLoader;
 import org.apache.camel.support.PluginHelper;
 import org.brainstorm.worker.common.GavUtil;
+import org.brainstorm.worker.common.Topics;
+import org.brainstorm.worker.common.processors.ShutdownProcessor;
+import org.brainstorm.worker.common.routes.PipelineEndRoute;
 import org.brainstorm.worker.routes.DataAcquiredRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,12 @@ public class WorkerMain implements Callable<Integer> {
 
     @CommandLine.Option(names = {"-p", "--bootstrap-server-port"}, description = "The Kafka bootstrap server port to use", defaultValue = "9092")
     private int bootstrapPort;
+
+    @CommandLine.Option(names = {"--consumes-from"}, description = "The Kafka topic from which to consume the trigger event")
+    private String consumesFrom;
+
+    @CommandLine.Option(names = {"--produces-to"}, description = "The Kafka topic produce the completion event")
+    private String producesTo;
 
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
@@ -99,7 +108,11 @@ public class WorkerMain implements Callable<Integer> {
         CountDownLatch launchLatch = new CountDownLatch(1);
 
         loadRoute(context, file);
-        context.addRoutes(new DataAcquiredRoute(bootstrapServer, bootstrapPort, launchLatch));
+
+        context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
+
+        context.addRoutes(new DataAcquiredRoute(bootstrapServer, bootstrapPort, producesTo, Topics.ACQUISITION_EVENT));
+        context.addRoutes(new PipelineEndRoute(Topics.ACQUISITION_EVENT));
 
         try {
             context.start();

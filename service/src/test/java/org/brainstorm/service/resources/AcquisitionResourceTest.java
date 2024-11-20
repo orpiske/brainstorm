@@ -19,11 +19,10 @@ package org.brainstorm.service.resources;
 
 import jakarta.ws.rs.core.Response;
 
+import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.brainstorm.api.dto.AcquisitionService;
 import org.brainstorm.service.util.RequestResponseUtil;
-import org.jboss.logging.Logger;
-import io.quarkus.test.junit.QuarkusTest;
 import org.jboss.logging.Logger;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,7 +53,6 @@ public class AcquisitionResourceTest {
         AcquisitionService service = new AcquisitionService();
         service.setName("test");
         service.setGav("org.id:test:1.0");
-
 
         given()
                 .contentType(ContentType.JSON)
