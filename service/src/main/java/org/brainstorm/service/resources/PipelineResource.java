@@ -17,9 +17,7 @@
 
 package org.brainstorm.service.resources;
 
-import java.util.Map;
 
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -28,7 +26,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.Base64;
+
 import org.brainstorm.api.pipeline.Pipeline;
+import org.brainstorm.service.util.YamlUtils;
 import org.jboss.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 
@@ -45,9 +46,12 @@ public class PipelineResource {
     public Response add(String body) {
         LOG.debugf("About to process pipeline: %s", body);
 
-        Yaml yaml = new Yaml();
         try {
-            final Pipeline pipeline = yaml.loadAs(body, Pipeline.class);
+            byte[] decodedBytes = Base64.getDecoder().decode(body.trim());
+            String data = new String(decodedBytes);
+
+            Yaml yaml = YamlUtils.getYamlForClass(Pipeline.class);
+            final Pipeline pipeline = yaml.loadAs(data, Pipeline.class);
 
             LOG.debugf("Pipeline created: %s", pipeline);
 

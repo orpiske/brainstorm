@@ -22,7 +22,7 @@ import java.util.List;
 
 public class AcquisitionStep extends Step {
     private String producesTo;
-    private String script;
+    private String file;
     private List<String> dependencies = new ArrayList<>();
 
     public String getProducesTo() {
@@ -33,12 +33,12 @@ public class AcquisitionStep extends Step {
         this.producesTo = producesTo;
     }
 
-    public String getScript() {
-        return script;
+    public String getFile() {
+        return file;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setFile(String file) {
+        this.file = file;
     }
 
     public List<String> getDependencies() {
@@ -53,7 +53,7 @@ public class AcquisitionStep extends Step {
     public String toString() {
         return "AcquisitionStep{" +
                 "producesTo='" + producesTo + '\'' +
-                ", file='" + script + '\'' +
+                ", file='" + file + '\'' +
                 ", dependencies=" + dependencies +
                 "} " + super.toString();
     }

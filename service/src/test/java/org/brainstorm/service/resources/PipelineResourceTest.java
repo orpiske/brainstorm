@@ -17,7 +17,7 @@
 
 package org.brainstorm.service.resources;
 
-import java.io.StringWriter;
+import java.util.Base64;
 import java.util.List;
 
 import jakarta.ws.rs.core.Response;
@@ -29,14 +29,13 @@ import org.brainstorm.api.pipeline.AcquisitionStep;
 import org.brainstorm.api.pipeline.Pipeline;
 import org.brainstorm.api.pipeline.Transformation;
 import org.brainstorm.api.pipeline.TransformationStep;
+import org.brainstorm.service.util.YamlUtils;
 import org.jboss.logging.Logger;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import static io.restassured.RestAssured.given;
 
@@ -57,28 +56,39 @@ public class PipelineResourceTest {
         Acquisition acquisition = new Acquisition();
         acquisition.getSteps().add(acquisitionStep);
 
-        TransformationStep transformationStep = new TransformationStep();
-        transformationStep.setType("run-worker");
-        transformationStep.setBootstrapServer("localhost");
-        transformationStep.setConsumesFrom("data.acquired");
-        transformationStep.setProducesTo("data.prepared");
-        transformationStep.setFile("/todo/change");
+        TransformationStep transformationStep1 = new TransformationStep();
+        transformationStep1.setType("run-worker");
+        transformationStep1.setBootstrapServer("localhost");
+        transformationStep1.setConsumesFrom("data.acquired");
+        transformationStep1.setProducesTo("data.prepared");
+        transformationStep1.setScript("/todo/change1");
+
+        TransformationStep transformationStep2 = new TransformationStep();
+        transformationStep2.setType("run-worker");
+        transformationStep2.setBootstrapServer("localhost");
+        transformationStep2.setConsumesFrom("data.prepared");
+        transformationStep2.setProducesTo("data.completed");
+        transformationStep2.setScript("/todo/change2");
+
 
         Transformation transformation = new Transformation();
-        transformation.getSteps().add(transformationStep);
+        transformation.getSteps().add(transformationStep1);
+        transformation.getSteps().add(transformationStep2);
 
         Pipeline pipeline = new Pipeline();
         pipeline.setAcquisition(acquisition);
         pipeline.setTransformation(transformation);
 
-        Yaml yaml = new Yaml();
+        Yaml yaml = YamlUtils.getYamlForClass(Pipeline.class);
+        final String pipelineStr = yaml.dump(pipeline);
 
-        final String pipeline1 = yaml.dumpAs(pipeline, new Tag("pipeline"), DumperOptions.FlowStyle.AUTO);
-        System.out.println(pipeline1);
+        LOG.debugf("Generated pipeline data \n%s", pipelineStr);
+        byte[] data = Base64.getEncoder().encode(pipelineStr.getBytes());
+        String encoded = new String(data);
 
         given()
                 .contentType(ContentType.TEXT)
-                .body(pipeline1)
+                .body(encoded)
                 .when()
                 .post(PipelineResource.BASE_URI)
                 .then()

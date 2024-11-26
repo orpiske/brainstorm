@@ -20,7 +20,7 @@ package org.brainstorm.api.pipeline;
 public class TransformationStep extends Step {
     private String producesTo;
     private String consumesFrom;
-    private String file;
+    private String script;
 
     public String getProducesTo() {
         return producesTo;
@@ -38,12 +38,12 @@ public class TransformationStep extends Step {
         this.consumesFrom = consumesFrom;
     }
 
-    public String getFile() {
-        return file;
+    public String getScript() {
+        return script;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public void setScript(String script) {
+        this.script = script;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class TransformationStep extends Step {
         return "TransformationStep{" +
                 "producesTo='" + producesTo + '\'' +
                 ", consumesFrom='" + consumesFrom + '\'' +
-                ", file='" + file + '\'' +
+                ", file='" + script + '\'' +
                 "} " + super.toString();
     }
 }
