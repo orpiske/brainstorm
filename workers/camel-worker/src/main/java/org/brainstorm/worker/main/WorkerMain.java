@@ -107,7 +107,11 @@ public class WorkerMain implements Callable<Integer> {
 
         CountDownLatch launchLatch = new CountDownLatch(1);
 
-        loadRoute(context, file);
+        if (file.contains("file://")) {
+            loadRoute(context, file);
+        } else {
+            loadRoute(context, "file://" + file);
+        }
 
         context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
 
