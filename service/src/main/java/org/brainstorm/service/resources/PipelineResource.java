@@ -32,8 +32,6 @@ import java.util.Base64;
 import io.vertx.core.eventbus.EventBus;
 import org.brainstorm.api.pipeline.Pipeline;
 import org.brainstorm.service.util.YamlUtils;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 
@@ -45,9 +43,6 @@ public class PipelineResource {
 
     @Inject
     EventBus eventBus;
-
-    @Channel("pipeline")
-    Emitter<Pipeline> pipelineEmitter;
 
     @POST
     @Produces(MediaType.MEDIA_TYPE_WILDCARD)
