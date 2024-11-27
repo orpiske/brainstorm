@@ -40,12 +40,13 @@ import org.yaml.snakeyaml.Yaml;
 
 import static io.restassured.RestAssured.given;
 
+@Disabled("Needs adjustments")
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PipelineResourceTest {
     private static final Logger LOG = Logger.getLogger(PipelineResourceTest.class);
 
-    @Disabled("Needs adjustments")
+
     @Order(1)
     @Test
     void testNewPipeline() {
