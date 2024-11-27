@@ -18,24 +18,85 @@
 package org.brainstorm.service.controller;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
+import io.quarkus.vertx.ConsumeEvent;
+import io.smallrye.context.SmallRyeManagedExecutor;
 import org.brainstorm.api.pipeline.AcquisitionStep;
 import org.brainstorm.api.pipeline.Pipeline;
+import org.brainstorm.api.pipeline.TransformationStep;
+import org.brainstorm.service.util.BrainstormConfiguration;
+import org.brainstorm.service.util.ProcessRunner;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class PipelineController {
+    private static final Logger LOG = Logger.getLogger(PipelineController.class);
+
+    @Inject
+    BrainstormConfiguration configuration;
+
+    SmallRyeManagedExecutor managedExecutor = SmallRyeManagedExecutor.builder()
+            .withExecutorService(Executors.newCachedThreadPool())
+            .build();
 
     private void execute(AcquisitionStep step) {
+        String path = configuration.worker().acquisition().path();
+        String bootstrapHost = configuration.bootstrapHost();
+        int bootstrapPort = configuration.bootstrapPort();
 
+        final String dependencies = step.getDependencies().stream().collect(Collectors.joining(","));
+        String producesTo = step.getProducesTo();
+
+        ProcessRunner.run(path, "-s", bootstrapHost,
+                "-p", String.valueOf(bootstrapPort),
+                "-f", step.getFile(),
+                "-d", dependencies,
+                "--produces-to", producesTo);
+    }
+
+    private void execute(TransformationStep step) {
+        String path = configuration.worker().runner().path();
+        String bootstrapHost = configuration.bootstrapHost();
+        int bootstrapPort = configuration.bootstrapPort();
+
+        String producesTo = step.getProducesTo();
+        String consumesFrom = step.getConsumesFrom();
+
+        ProcessRunner.run(path, "-s", bootstrapHost,
+                "-p", String.valueOf(bootstrapPort),
+                "-S", step.getScript(),
+                "--consumes-from", consumesFrom,
+                "--produces-to", producesTo);
     }
 
     public void execute(Pipeline pipeline) {
+        LOG.info("Executing pipeline");
+
+        LOG.info("Executing acquisition steps");
         final List<AcquisitionStep> steps = pipeline.getAcquisition().getSteps();
         for (AcquisitionStep step : steps) {
             execute(step);
         }
+        LOG.info("Finished acquisition steps");
+
+        LOG.info("Executing transformation steps");
+        final List<TransformationStep> transformationSteps = pipeline.getTransformation().getSteps();
+        for (TransformationStep step : transformationSteps) {
+            execute(step);
+        }
+        LOG.info("Finished transformation steps");
+    }
+
+    @ConsumeEvent(value = "pipeline", blocking = true)
+    public void executeInternally(Pipeline pipeline) {
+        LOG.info("Executing pipeline internally (blocking)");
+
+        managedExecutor.execute(() -> execute(pipeline));
     }
 
 }

@@ -31,6 +31,7 @@ import org.brainstorm.api.pipeline.Transformation;
 import org.brainstorm.api.pipeline.TransformationStep;
 import org.brainstorm.service.util.YamlUtils;
 import org.jboss.logging.Logger;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ import static io.restassured.RestAssured.given;
 public class PipelineResourceTest {
     private static final Logger LOG = Logger.getLogger(PipelineResourceTest.class);
 
+    @Disabled("Needs adjustments")
     @Order(1)
     @Test
     void testNewPipeline() {

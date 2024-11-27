@@ -18,6 +18,7 @@
 package org.brainstorm.service.resources;
 
 
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -28,8 +29,11 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.Base64;
 
+import io.vertx.core.eventbus.EventBus;
 import org.brainstorm.api.pipeline.Pipeline;
 import org.brainstorm.service.util.YamlUtils;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 
@@ -38,6 +42,12 @@ import org.yaml.snakeyaml.Yaml;
 public class PipelineResource {
     private static final Logger LOG = Logger.getLogger(PipelineResource.class);
     static final String BASE_URI = "/api/v1/pipeline";
+
+    @Inject
+    EventBus eventBus;
+
+    @Channel("pipeline")
+    Emitter<Pipeline> pipelineEmitter;
 
     @POST
     @Produces(MediaType.MEDIA_TYPE_WILDCARD)
@@ -54,6 +64,7 @@ public class PipelineResource {
             final Pipeline pipeline = yaml.loadAs(data, Pipeline.class);
 
             LOG.debugf("Pipeline created: %s", pipeline);
+            eventBus.publish("pipeline", pipeline);
 
             return Response.ok().build();
         } catch (Exception e) {
