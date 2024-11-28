@@ -17,27 +17,24 @@
 
 package org.brainstorm.service.util;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public class YamlUtils {
+public class MapperUtils {
 
     /**
-     * Get a YAML object instance without the tags
-     * @param clazz
+     * Get a YAML object mapper without the tags
      * @return
      */
-    public static Yaml getYamlForClass(Class<?> clazz) {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setPrettyFlow(true);
-        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
+    public static ObjectMapper newForYaml() {
+        return new ObjectMapper(YAMLFactory.builder().build());
+    }
 
-        Representer representer = new Representer(options);
-        representer.addClassTag(clazz, Tag.MAP);
-
-        return new Yaml(representer, options);
+    /**
+     * Get a regular object mapper instance without the tags
+     * @return
+     */
+    public static ObjectMapper newForDefault() {
+        return new ObjectMapper();
     }
 }

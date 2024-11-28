@@ -15,9 +15,19 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.transformation;
 
-public class TransformationStep extends Step {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.brainstorm.api.pipeline.Step;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = LocalStep.class, name = "localStep"),
+})
+public abstract class AbstractTransformationStep extends Step {
     private String producesTo;
     private String consumesFrom;
     private String script;

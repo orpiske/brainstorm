@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.transformation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Transformation {
-    private List<TransformationStep> steps = new ArrayList<>();
+    private List<AbstractTransformationStep> steps = new ArrayList<>();
 
-    public List<TransformationStep> getSteps() {
+    public List<AbstractTransformationStep> getSteps() {
         return steps;
     }
 
-    public void setSteps(List<TransformationStep> steps) {
+    public void setSteps(List<AbstractTransformationStep> steps) {
         this.steps = steps;
     }
 

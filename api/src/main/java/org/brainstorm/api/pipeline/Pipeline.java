@@ -17,6 +17,9 @@
 
 package org.brainstorm.api.pipeline;
 
+import org.brainstorm.api.pipeline.acquisition.Acquisition;
+import org.brainstorm.api.pipeline.transformation.Transformation;
+
 public class Pipeline {
     private Acquisition acquisition;
     private Transformation transformation;

@@ -22,25 +22,24 @@ import java.util.List;
 
 import jakarta.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import org.brainstorm.api.pipeline.Acquisition;
-import org.brainstorm.api.pipeline.AcquisitionStep;
 import org.brainstorm.api.pipeline.Pipeline;
-import org.brainstorm.api.pipeline.Transformation;
-import org.brainstorm.api.pipeline.TransformationStep;
-import org.brainstorm.service.util.YamlUtils;
+import org.brainstorm.api.pipeline.acquisition.Acquisition;
+import org.brainstorm.api.pipeline.acquisition.CamelStep;
+import org.brainstorm.api.pipeline.transformation.LocalStep;
+import org.brainstorm.api.pipeline.transformation.Transformation;
+import org.brainstorm.service.util.MapperUtils;
 import org.jboss.logging.Logger;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.yaml.snakeyaml.Yaml;
 
 import static io.restassured.RestAssured.given;
 
-@Disabled("Needs adjustments")
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PipelineResourceTest {
@@ -49,41 +48,30 @@ public class PipelineResourceTest {
 
     @Order(1)
     @Test
-    void testNewPipeline() {
-        AcquisitionStep acquisitionStep = new AcquisitionStep();
-        acquisitionStep.setType("camel-worker");
-        acquisitionStep.setBootstrapServer("localhost");
-        acquisitionStep.setProducesTo("data.acquired");
-        acquisitionStep.setDependencies(List.of("org.brainstorm.camel:code-fetcher:1.0-SNAPSHOT"));
+    void testValidateJsonPipeline() throws JsonProcessingException {
+        final Pipeline pipeline = newPipeline();
 
-        Acquisition acquisition = new Acquisition();
-        acquisition.getSteps().add(acquisitionStep);
+        ObjectMapper objectMapper = MapperUtils.newForDefault();
+        final String pipelineStr = objectMapper.writeValueAsString(pipeline);
 
-        TransformationStep transformationStep1 = new TransformationStep();
-        transformationStep1.setType("run-worker");
-        transformationStep1.setBootstrapServer("localhost");
-        transformationStep1.setConsumesFrom("data.acquired");
-        transformationStep1.setProducesTo("data.prepared");
-        transformationStep1.setScript("/todo/change1");
+        LOG.debugf("Generated pipeline data \n%s", pipelineStr);
 
-        TransformationStep transformationStep2 = new TransformationStep();
-        transformationStep2.setType("run-worker");
-        transformationStep2.setBootstrapServer("localhost");
-        transformationStep2.setConsumesFrom("data.prepared");
-        transformationStep2.setProducesTo("data.completed");
-        transformationStep2.setScript("/todo/change2");
+        given()
+                .contentType(ContentType.JSON)
+                .body(pipelineStr)
+                .when()
+                .post(PipelineResource.BASE_URI + "/validate")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+    }
 
+    @Order(2)
+    @Test
+    void testValidateYAMLPipeline() throws JsonProcessingException {
+        final Pipeline pipeline = newPipeline();
 
-        Transformation transformation = new Transformation();
-        transformation.getSteps().add(transformationStep1);
-        transformation.getSteps().add(transformationStep2);
-
-        Pipeline pipeline = new Pipeline();
-        pipeline.setAcquisition(acquisition);
-        pipeline.setTransformation(transformation);
-
-        Yaml yaml = YamlUtils.getYamlForClass(Pipeline.class);
-        final String pipelineStr = yaml.dump(pipeline);
+        ObjectMapper objectMapper = MapperUtils.newForYaml();
+        final String pipelineStr = objectMapper.writeValueAsString(pipeline);
 
         LOG.debugf("Generated pipeline data \n%s", pipelineStr);
         byte[] data = Base64.getEncoder().encode(pipelineStr.getBytes());
@@ -93,10 +81,41 @@ public class PipelineResourceTest {
                 .contentType(ContentType.TEXT)
                 .body(encoded)
                 .when()
-                .post(PipelineResource.BASE_URI)
+                .post(PipelineResource.BASE_URI + "/validate/yaml")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
+    private static Pipeline newPipeline() {
+        CamelStep camelStep1 = new CamelStep();
+        camelStep1.setBootstrapServer("localhost");
+        camelStep1.setProducesTo("data.acquired");
+        camelStep1.setDependencies(List.of("org.brainstorm.camel:code-fetcher:1.0-SNAPSHOT"));
+
+        Acquisition acquisition = new Acquisition();
+        acquisition.getSteps().add(camelStep1);
+
+        LocalStep localStep1 = new LocalStep();
+        localStep1.setBootstrapServer("localhost");
+        localStep1.setConsumesFrom("data.acquired");
+        localStep1.setProducesTo("data.prepared");
+        localStep1.setScript("/todo/change1");
+
+        LocalStep localStep2 = new LocalStep();
+        localStep2.setBootstrapServer("localhost");
+        localStep2.setConsumesFrom("data.prepared");
+        localStep2.setProducesTo("data.completed");
+        localStep2.setScript("/todo/change2");
+
+        Transformation transformation = new Transformation();
+
+        transformation.getSteps().add(localStep1);
+        transformation.getSteps().add(localStep2);
+
+        Pipeline pipeline = new Pipeline();
+        pipeline.setAcquisition(acquisition);
+        pipeline.setTransformation(transformation);
+        return pipeline;
+    }
 
 }

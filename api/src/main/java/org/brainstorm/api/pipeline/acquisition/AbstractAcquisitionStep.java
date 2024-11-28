@@ -15,12 +15,22 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.acquisition;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AcquisitionStep extends Step {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.brainstorm.api.pipeline.Step;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = CamelStep.class, name = "camelStep"),
+})
+public abstract class AbstractAcquisitionStep extends Step {
     private String producesTo;
     private String file;
     private List<String> dependencies = new ArrayList<>();

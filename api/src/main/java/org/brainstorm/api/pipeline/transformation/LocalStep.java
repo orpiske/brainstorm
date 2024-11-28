@@ -15,33 +15,10 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.transformation;
 
-public abstract class Step {
-    private String bootstrapServer;
-    private int port;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-    public String getBootstrapServer() {
-        return bootstrapServer;
-    }
-
-    public void setBootstrapServer(String bootstrapServer) {
-        this.bootstrapServer = bootstrapServer;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    @Override
-    public String toString() {
-        return "Step{" +
-                "bootstrapServer='" + bootstrapServer + '\'' +
-                ", port=" + port +
-                '}';
-    }
+@JsonTypeName("localStep")
+public class LocalStep extends AbstractTransformationStep {
 }

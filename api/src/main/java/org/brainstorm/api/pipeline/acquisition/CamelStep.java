@@ -15,36 +15,10 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.acquisition;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-public class Acquisition {
-    private List<AcquisitionStep> steps = new ArrayList<>();
-
-    public List<AcquisitionStep> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<AcquisitionStep> steps) {
-        this.steps = steps;
-    }
-
-    @Override
-    public String toString() {
-        return "Acquisition{" +
-                "steps=" + steps +
-                '}';
-    }
-
-    //    private AcquisitionStepList steps;
-//
-//    public AcquisitionStepList getSteps() {
-//        return steps;
-//    }
-//
-//    public void setSteps(AcquisitionStepList steps) {
-//        this.steps = steps;
-//    }
+@JsonTypeName("camelStep")
+public class CamelStep extends AbstractAcquisitionStep {
 }

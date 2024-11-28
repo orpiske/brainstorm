@@ -15,33 +15,26 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.acquisition;
 
-public abstract class Step {
-    private String bootstrapServer;
-    private int port;
+import java.util.ArrayList;
+import java.util.List;
 
-    public String getBootstrapServer() {
-        return bootstrapServer;
+public class Acquisition {
+    private List<AbstractAcquisitionStep> steps = new ArrayList<>();
+
+    public List<AbstractAcquisitionStep> getSteps() {
+        return steps;
     }
 
-    public void setBootstrapServer(String bootstrapServer) {
-        this.bootstrapServer = bootstrapServer;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    public void setSteps(List<AbstractAcquisitionStep> steps) {
+        this.steps = steps;
     }
 
     @Override
     public String toString() {
-        return "Step{" +
-                "bootstrapServer='" + bootstrapServer + '\'' +
-                ", port=" + port +
+        return "Acquisition{" +
+                "steps=" + steps +
                 '}';
     }
 }

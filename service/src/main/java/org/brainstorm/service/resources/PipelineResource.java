@@ -29,11 +29,11 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.Base64;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.eventbus.EventBus;
 import org.brainstorm.api.pipeline.Pipeline;
-import org.brainstorm.service.util.YamlUtils;
+import org.brainstorm.service.util.MapperUtils;
 import org.jboss.logging.Logger;
-import org.yaml.snakeyaml.Yaml;
 
 @Transactional
 @Path("/api/v1/pipeline/")
@@ -44,19 +44,11 @@ public class PipelineResource {
     @Inject
     EventBus eventBus;
 
-    @POST
-    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
-    @Consumes(MediaType.MEDIA_TYPE_WILDCARD)
-    @Path("/")
-    public Response add(String body) {
+    private Response add(ObjectMapper mapper, String body) {
         LOG.debugf("About to process pipeline: %s", body);
 
         try {
-            byte[] decodedBytes = Base64.getDecoder().decode(body.trim());
-            String data = new String(decodedBytes);
-
-            Yaml yaml = YamlUtils.getYamlForClass(Pipeline.class);
-            final Pipeline pipeline = yaml.loadAs(data, Pipeline.class);
+            final Pipeline pipeline = mapper.readValue(body, Pipeline.class);
 
             LOG.debugf("Pipeline created: %s", pipeline);
             eventBus.publish("pipeline", pipeline);
@@ -66,5 +58,68 @@ public class PipelineResource {
             LOG.error(e);
             return Response.serverError().build();
         }
+    }
+
+    @POST
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response add(String body) {
+        ObjectMapper mapper = MapperUtils.newForDefault();
+
+        return add(mapper, body);
+    }
+
+    @POST
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
+    @Consumes(MediaType.MEDIA_TYPE_WILDCARD)
+    @Path("/yaml")
+    public Response addYaml(String body) {
+        try {
+            ObjectMapper mapper = MapperUtils.newForYaml();
+            byte[] decodedBytes = Base64.getDecoder().decode(body.trim());
+
+            return add(mapper, new String(decodedBytes));
+        } catch (Exception e) {
+            LOG.error(e);
+            return Response.serverError().build();
+        }
+    }
+
+
+    private Response validate(ObjectMapper mapper, String body) {
+        LOG.debugf("About to validate pipeline: %s", body);
+
+        try {
+            final Pipeline pipeline = mapper.readValue(body, Pipeline.class);
+
+            LOG.debugf("Pipeline validated: %s", pipeline);
+            return Response.ok().build();
+        } catch (Exception e) {
+            LOG.error(e);
+            return Response.serverError().build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/validate")
+    public Response validate(String body) {
+        ObjectMapper mapper = MapperUtils.newForDefault();
+        return validate(mapper, body);
+    }
+
+
+
+    @POST
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
+    @Consumes(MediaType.MEDIA_TYPE_WILDCARD)
+    @Path("/validate/yaml")
+    public Response validateYaml(String body) {
+        byte[] decodedBytes = Base64.getDecoder().decode(body.trim());
+
+        ObjectMapper mapper = MapperUtils.newForYaml();
+        return validate(mapper, new String(decodedBytes));
     }
 }
