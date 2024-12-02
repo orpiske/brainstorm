@@ -17,20 +17,21 @@
 
 package org.brainstorm.service.controller;
 
-import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.context.SmallRyeManagedExecutor;
 import org.brainstorm.api.pipeline.Pipeline;
 import org.brainstorm.api.pipeline.acquisition.AbstractAcquisitionStep;
 import org.brainstorm.api.pipeline.transformation.AbstractTransformationStep;
 import org.brainstorm.service.util.BrainstormConfiguration;
-import org.brainstorm.service.util.ProcessRunner;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -40,38 +41,34 @@ public class PipelineController {
     @Inject
     BrainstormConfiguration configuration;
 
+    @Inject
+    @Channel("acquisition")
+    Emitter<String> stepEmitter;
+
+    @Inject
+    @Channel("transformation")
+    Emitter<String> transformationEmitter;
+
     SmallRyeManagedExecutor managedExecutor = SmallRyeManagedExecutor.builder()
             .withExecutorService(Executors.newCachedThreadPool())
             .build();
 
-    private void execute(AbstractAcquisitionStep step) {
-        String path = configuration.worker().acquisition().path();
-        String bootstrapHost = configuration.bootstrapHost();
-        int bootstrapPort = configuration.bootstrapPort();
+    private ObjectMapper mapper = new ObjectMapper();
 
-//        final String dependencies = step.getStep().getDependencies().stream().collect(Collectors.joining(","));
-//        String producesTo = step.getProducesTo();
-//
-//        ProcessRunner.run(path, "-s", bootstrapHost,
-//                "-p", String.valueOf(bootstrapPort),
-//                "-f", step.getFile(),
-//                "-d", dependencies,
-//                "--produces-to", producesTo);
+    private void execute(AbstractAcquisitionStep step) {
+        try {
+            stepEmitter.send(mapper.writeValueAsString(step));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void execute(AbstractTransformationStep step) {
-        String path = configuration.worker().runner().path();
-        String bootstrapHost = configuration.bootstrapHost();
-        int bootstrapPort = configuration.bootstrapPort();
-
-//        String producesTo = step.getProducesTo();
-//        String consumesFrom = step.getConsumesFrom();
-//
-//        ProcessRunner.run(path, "-s", bootstrapHost,
-//                "-p", String.valueOf(bootstrapPort),
-//                "-S", step.getScript(),
-//                "--consumes-from", consumesFrom,
-//                "--produces-to", producesTo);
+        try {
+            transformationEmitter.send(mapper.writeValueAsString(step));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void execute(Pipeline pipeline) {
@@ -79,22 +76,22 @@ public class PipelineController {
 
         LOG.info("Executing acquisition steps");
         final var steps = pipeline.getAcquisition().getSteps();
-//        for (AcquisitionStep step : steps) {
-//            execute(step);
-//        }
-//        LOG.info("Finished acquisition steps");
-//
-//        LOG.info("Executing transformation steps");
-//        final var transformationSteps = pipeline.getTransformation().getSteps();
-//        for (TransformationStep step : transformationSteps) {
-//            execute(step);
-//        }
+        for (var step : steps) {
+            execute(step);
+        }
+        LOG.info("Finished acquisition steps");
+
+        LOG.info("Executing transformation steps");
+        final var transformationSteps = pipeline.getTransformation().getSteps();
+        for (var step : transformationSteps) {
+            execute(step);
+        }
         LOG.info("Finished transformation steps");
     }
 
     @ConsumeEvent(value = "pipeline", blocking = true)
     public void executeInternally(Pipeline pipeline) {
-        LOG.info("Executing pipeline internally (blocking)");
+        LOG.info("Executing pipeline internallzy (blocking)");
 
         managedExecutor.execute(() -> execute(pipeline));
     }
