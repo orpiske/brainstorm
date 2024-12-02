@@ -30,6 +30,7 @@
         <module>api</module>
         <module>workers</module>
         <module>service</module>
+        <module>operator</module>
     </modules>
 
 </project>
