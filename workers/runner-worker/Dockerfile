@@ -19,6 +19,6 @@ FROM eclipse-temurin:17-ubi9-minimal as base
 LABEL maintainer="orpiske@apache.org"
 RUN mkdir -p /opt/brainstorm/worker
 ADD target/run.sh /opt/brainstorm/worker/run.sh
-ADD target/camel-worker-jar-with-dependencies.jar /opt/brainstorm/worker/
+ADD target/runner-worker-jar-with-dependencies.jar /opt/brainstorm/worker/
 RUN chmod +x opt/brainstorm/worker/run.sh
 CMD opt/brainstorm/worker/run.sh
