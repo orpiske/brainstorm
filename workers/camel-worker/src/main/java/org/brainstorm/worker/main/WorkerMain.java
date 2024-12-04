@@ -1,7 +1,16 @@
 package org.brainstorm.worker.main;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ExtendedCamelContext;
@@ -101,17 +110,75 @@ public class WorkerMain implements Callable<Integer> {
         System.exit(exitCode);
     }
 
+    public static boolean waitForFile(File routeFile) throws IOException, InterruptedException {
+        int retries = 30;
+        int waitSeconds = 1;
+
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        Path path = routeFile.getParentFile().toPath();
+
+        if (routeFile.exists()) {
+            LOG.info("File {} already available", routeFile);
+            return true;
+        }
+
+        // We watch for both the file creation and truncation
+        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+
+
+        do {
+            LOG.info("Waiting {} seconds for {} to be available", retries * waitSeconds, routeFile);
+            WatchKey watchKey = watchService.poll(1, TimeUnit.SECONDS);
+
+            if (watchKey == null) {
+                continue;
+            }
+
+            for (WatchEvent<?> event : watchKey.pollEvents()) {
+
+                /*
+                  It should return a Path object for ENTRY_CREATE and ENTRY_MODIFY events
+                 */
+                Object context = event.context();
+                if (!(context instanceof Path)) {
+                    LOG.warn("Received an unexpected event of kind {} for context {}", event.kind(), event.context());
+                    continue;
+                }
+
+                Path contextPath = (Path) context;
+
+                if (contextPath.toString().equals(routeFile.getName())) {
+                    LOG.debug("File at the build path {} had a matching event of type: {}", routeFile.getParentFile().getPath(),
+                            event.kind());
+
+                    return false;
+                } else {
+                    LOG.debug("Ignoring a watch event at build path {} of type {} for file: {}", routeFile.getParentFile().getPath(),
+                            event.kind(), contextPath.getFileName());
+                }
+            }
+            watchKey.reset();
+        } while (!routeFile.exists() && retries-- > 0);
+
+        return routeFile.exists();
+    }
+
     @Override
     public Integer call() throws Exception {
+        if (file.contains("file://")) {
+            LOG.error("Invalid file {} (do not prefix with file://)", file);
+            return 1;
+        }
+
+        if (!waitForFile(new File(file))) {
+            return 2;
+        }
+
         CamelContext context = new DefaultCamelContext();
 
         CountDownLatch launchLatch = new CountDownLatch(1);
 
-        if (file.contains("file://")) {
-            loadRoute(context, file);
-        } else {
-            loadRoute(context, "file://" + file);
-        }
+        loadRoute(context, "file://" + file);
 
         context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
 
