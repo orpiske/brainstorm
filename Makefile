@@ -8,6 +8,7 @@ build:
 
 push:
 	podman push $(REGISTRY)/$(ORGANIZATION)/operator
+	podman push $(REGISTRY)/$(ORGANIZATION)/service
 	podman push $(REGISTRY)/$(ORGANIZATION)/camel-worker
 	podman push $(REGISTRY)/$(ORGANIZATION)/runner-worker
 
