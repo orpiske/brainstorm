@@ -1,20 +1,17 @@
 package org.brainstorm.service.resources;
 
-import java.util.List;
+import java.util.Base64;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import org.brainstorm.api.dto.AcquisitionService;
-import org.brainstorm.service.repository.AcquisitionServiceRepository;
+import io.vertx.core.eventbus.EventBus;
 import org.brainstorm.service.util.RequestResponseUtil;
 import org.jboss.logging.Logger;
 
@@ -25,45 +22,22 @@ public class AcquisitionResource {
     static final String BASE_URI = "/api/v1/acquisition/service";
 
     @Inject
-    AcquisitionServiceRepository repository;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllServices() {
-        try {
-            final List<AcquisitionService> qnaList = repository.listAll();
-
-            return Response.ok(qnaList).build();
-        } catch (Exception e) {
-            LOG.errorf("Unable to list activities: %s", e.getMessage(), e);
-            return Response.serverError().build();
-        }
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/id/{id}")
-    public Response getById(@PathParam("id") Long id) {
-        LOG.infof("Getting service info for %d", id);
-
-        try {
-            final var record = repository.findById(id);
-            return RequestResponseUtil.validateFetchedObject(record);
-        } catch (Exception e) {
-            return Response.serverError().build();
-        }
-    }
+    EventBus eventBus;
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
+    @Consumes(MediaType.MEDIA_TYPE_WILDCARD)
     @Path("/")
-    public Response add(AcquisitionService service) {
-        LOG.infof("Adding service %s", service.getName());
+    public Response add(String body) {
+        byte[] decodedBytes = Base64.getDecoder().decode(body.trim());
+        String route = new String(decodedBytes);
+
+
+        LOG.infof("Adding service %s", route);
 
         try {
-            repository.persist(service);
-            return Response.created(RequestResponseUtil.toLocation(BASE_URI, service.getId())).build();
+            eventBus.publish("acquisition", route);
+            return Response.ok().build();
         } catch (Exception e) {
             return Response.serverError().build();
         }

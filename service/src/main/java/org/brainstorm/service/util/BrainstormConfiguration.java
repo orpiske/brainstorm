@@ -9,6 +9,12 @@ public interface BrainstormConfiguration {
 
     String bootstrapHost();
 
+    Data data();
+
+    interface Data {
+        String path();
+    }
+
     @WithDefault("9092")
     int bootstrapPort();
 

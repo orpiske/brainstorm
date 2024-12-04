@@ -17,21 +17,23 @@
 
 package org.brainstorm.service.resources;
 
+import java.io.File;
+import java.util.Base64;
+import java.util.concurrent.TimeUnit;
+
 import jakarta.ws.rs.core.Response;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import org.brainstorm.api.dto.AcquisitionService;
-import org.brainstorm.service.util.RequestResponseUtil;
+import org.awaitility.Awaitility;
 import org.jboss.logging.Logger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -41,40 +43,20 @@ public class AcquisitionResourceTest {
     @Order(1)
     @Test
     void testActivitiesEmpty() {
-        given()
-                .when().get(AcquisitionResource.BASE_URI)
-                .then()
-                .statusCode(Response.Status.OK.getStatusCode());
-    }
-
-    @Order(2)
-    @Test
-    void testGetActivities() {
-        AcquisitionService service = new AcquisitionService();
-        service.setName("test");
-        service.setGav("org.id:test:1.0");
+        byte[] data = Base64.getEncoder().encode("abc\ndef\nghi\njkl".getBytes());
+        String body = new String(data);
 
         given()
-                .contentType(ContentType.JSON)
-                .body(service)
+                .contentType(ContentType.TEXT)
+                .body(body)
                 .when()
                 .post(AcquisitionResource.BASE_URI)
                 .then()
-                .statusCode(Response.Status.CREATED.getStatusCode());
-    }
+                .statusCode(Response.Status.OK.getStatusCode());
 
-    @Order(3)
-    @Test
-    void getById() {
-        final var response = given()
-                .when().get(RequestResponseUtil.toLocationString(AcquisitionResource.BASE_URI, 1));
+        final File file = new File("target/data/route.yaml");
+        Awaitility.await().atMost(3, TimeUnit.SECONDS).untilAsserted(() ->
+                Assertions.assertTrue(file.exists(), "A route file should have been created"));
 
-        LOG.infof("Response: %s", response.getBody().asString());
-
-        response.then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body(  "id", notNullValue(),
-                        "name", is("test"),
-                        "gav", is("org.id:test:1.0"));
     }
 }
