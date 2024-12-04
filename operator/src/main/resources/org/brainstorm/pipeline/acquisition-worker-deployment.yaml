@@ -17,12 +17,11 @@ spec:
           image: quay.io/bstorm/camel-worker:latest
           command:
             -
-#          ports:
-#            - containerPort: 80
-#          volumeMounts:
-#            - name: camel-runner-volume
-#              mountPath: /usr/share/nginx/html
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /opt/brainstorm/data
       volumes:
-        - name: camel-runner-volume
+        - name: camel-config-volume
           configMap:
             name: ""
+        - name: shared-volume

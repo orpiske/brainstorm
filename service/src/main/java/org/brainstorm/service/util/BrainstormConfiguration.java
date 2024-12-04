@@ -17,22 +17,4 @@ public interface BrainstormConfiguration {
 
     @WithDefault("9092")
     int bootstrapPort();
-
-    Worker worker();
-
-    interface Worker {
-
-        interface Acquisition {
-
-            String path();
-        }
-
-        interface Runner {
-            String path();
-        }
-
-        Acquisition acquisition();
-
-        Runner runner();
-    }
 }

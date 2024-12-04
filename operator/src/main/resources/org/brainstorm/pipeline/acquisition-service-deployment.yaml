@@ -1,0 +1,27 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: ""
+spec:
+  selector:
+    matchLabels:
+      app: ""
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ""
+    spec:
+      containers:
+        - name: service
+          image: quay.io/bstorm/service:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /opt/brainstorm/data
+      volumes:
+        - name: camel-config-volume
+          configMap:
+            name: ""
+        - name: shared-volume

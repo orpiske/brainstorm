@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.transformation;
+package org.brainstorm.api.pipeline.acquisition;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.brainstorm.api.pipeline.Step;
+import java.util.ArrayList;
+import java.util.List;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.WRAPPER_OBJECT)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = LocalStep.class, name = "localStep"),
-})
-public abstract class AbstractTransformationStep extends Step {
+public class AcquisitionStep {
     private String producesTo;
-    private String consumesFrom;
-    private String script;
+    private String file;
+    private List<String> dependencies = new ArrayList<>();
 
     public String getProducesTo() {
         return producesTo;
@@ -40,28 +33,28 @@ public abstract class AbstractTransformationStep extends Step {
         this.producesTo = producesTo;
     }
 
-    public String getConsumesFrom() {
-        return consumesFrom;
+    public String getFile() {
+        return file;
     }
 
-    public void setConsumesFrom(String consumesFrom) {
-        this.consumesFrom = consumesFrom;
+    public void setFile(String file) {
+        this.file = file;
     }
 
-    public String getScript() {
-        return script;
+    public List<String> getDependencies() {
+        return dependencies;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setDependencies(List<String> dependencies) {
+        this.dependencies = dependencies;
     }
 
     @Override
     public String toString() {
-        return "TransformationStep{" +
+        return "AcquisitionStep{" +
                 "producesTo='" + producesTo + '\'' +
-                ", consumesFrom='" + consumesFrom + '\'' +
-                ", file='" + script + '\'' +
-                "} " + super.toString();
+                ", file='" + file + '\'' +
+                ", dependencies=" + dependencies +
+                '}';
     }
 }

@@ -1,63 +1,32 @@
 package org.brainstorm.pipeline;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
+import org.brainstorm.api.pipeline.infra.PipelineInfra;
 
 public class AcquisitionSpec {
-    private String bootstrapServer;
-    private int port;
-    private String producesTo;
-    private String file;
-    private List<String> dependencies = new ArrayList<>();
+    private PipelineInfra pipelineInfra;
+    private AcquisitionStep acquisitionStep;
 
-    public String getBootstrapServer() {
-        return bootstrapServer;
+    public PipelineInfra getPipelineInfra() {
+        return pipelineInfra;
     }
 
-    public void setBootstrapServer(String bootstrapServer) {
-        this.bootstrapServer = bootstrapServer;
+    public void setPipelineInfra(PipelineInfra pipelineInfra) {
+        this.pipelineInfra = pipelineInfra;
     }
 
-    public int getPort() {
-        return port;
+    public AcquisitionStep getAcquisitionStep() {
+        return acquisitionStep;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public String getProducesTo() {
-        return producesTo;
-    }
-
-    public void setProducesTo(String producesTo) {
-        this.producesTo = producesTo;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
-    public List<String> getDependencies() {
-        return dependencies;
-    }
-
-    public void setDependencies(List<String> dependencies) {
-        this.dependencies = dependencies;
+    public void setAcquisitionStep(AcquisitionStep acquisitionStep) {
+        this.acquisitionStep = acquisitionStep;
     }
 
     @Override
     public String toString() {
         return "AcquisitionSpec{" +
-                "bootstrapServer='" + bootstrapServer + '\'' +
-                ", port=" + port +
-                ", producesTo='" + producesTo + '\'' +
-                ", file='" + file + '\'' +
-                ", dependencies=" + dependencies +
+                "acquisitionStep=" + acquisitionStep +
                 '}';
     }
 }

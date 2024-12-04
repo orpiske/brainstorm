@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline;
+package org.brainstorm.api.pipeline.infra;
 
-public abstract class Step {
+public class PipelineInfra {
     private String bootstrapServer;
     private int port;
 
@@ -39,7 +39,7 @@ public abstract class Step {
 
     @Override
     public String toString() {
-        return "Step{" +
+        return "PipelineInfra{" +
                 "bootstrapServer='" + bootstrapServer + '\'' +
                 ", port=" + port +
                 '}';

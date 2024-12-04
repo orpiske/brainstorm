@@ -15,25 +15,12 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.acquisition;
+package org.brainstorm.api.pipeline.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.brainstorm.api.pipeline.Step;
-
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.WRAPPER_OBJECT)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = CamelStep.class, name = "camelStep"),
-})
-public abstract class AbstractAcquisitionStep extends Step {
+public class TransformationStep {
     private String producesTo;
-    private String file;
-    private List<String> dependencies = new ArrayList<>();
+    private String consumesFrom;
+    private String script;
 
     public String getProducesTo() {
         return producesTo;
@@ -43,28 +30,28 @@ public abstract class AbstractAcquisitionStep extends Step {
         this.producesTo = producesTo;
     }
 
-    public String getFile() {
-        return file;
+    public String getConsumesFrom() {
+        return consumesFrom;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public void setConsumesFrom(String consumesFrom) {
+        this.consumesFrom = consumesFrom;
     }
 
-    public List<String> getDependencies() {
-        return dependencies;
+    public String getScript() {
+        return script;
     }
 
-    public void setDependencies(List<String> dependencies) {
-        this.dependencies = dependencies;
+    public void setScript(String script) {
+        this.script = script;
     }
 
     @Override
     public String toString() {
-        return "AcquisitionStep{" +
+        return "TransformationStep{" +
                 "producesTo='" + producesTo + '\'' +
-                ", file='" + file + '\'' +
-                ", dependencies=" + dependencies +
-                "} " + super.toString();
+                ", consumesFrom='" + consumesFrom + '\'' +
+                ", script='" + script + '\'' +
+                '}';
     }
 }

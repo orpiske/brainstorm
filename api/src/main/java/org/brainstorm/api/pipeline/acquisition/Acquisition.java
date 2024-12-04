@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Acquisition {
-    private List<AbstractAcquisitionStep> steps = new ArrayList<>();
+    private List<AcquisitionStep> steps = new ArrayList<>();
 
-    public List<AbstractAcquisitionStep> getSteps() {
+    public List<AcquisitionStep> getSteps() {
         return steps;
     }
 
-    public void setSteps(List<AbstractAcquisitionStep> steps) {
+    public void setSteps(List<AcquisitionStep> steps) {
         this.steps = steps;
     }
 
