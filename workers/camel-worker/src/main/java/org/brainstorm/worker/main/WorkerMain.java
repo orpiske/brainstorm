@@ -53,6 +53,9 @@ public class WorkerMain implements Callable<Integer> {
     @CommandLine.Option(names = {"--produces-to"}, description = "The Kafka topic produce the completion event")
     private String producesTo;
 
+    @CommandLine.Option(names = {"--wait"}, description = "Wait forever until a file is created", defaultValue = "false")
+    private boolean waitForever;
+
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
 
@@ -110,7 +113,23 @@ public class WorkerMain implements Callable<Integer> {
         System.exit(exitCode);
     }
 
-    public static boolean waitForFile(File routeFile) throws IOException, InterruptedException {
+    public static boolean isFileAvailable(File routeFile, int retries, boolean waitForever) {
+        if (routeFile.exists()) {
+            return true;
+        }
+
+        if (!waitForever) {
+            if (retries > 0) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean waitForFile(File routeFile, boolean waitForever) throws IOException, InterruptedException {
         int retries = 30;
         int waitSeconds = 1;
 
@@ -127,7 +146,12 @@ public class WorkerMain implements Callable<Integer> {
 
 
         do {
-            LOG.info("Waiting {} seconds for {} to be available", retries * waitSeconds, routeFile);
+            if (!waitForever) {
+                LOG.info("Waiting {} seconds for {} to be available", retries * waitSeconds, routeFile);
+            } else {
+                LOG.info("Waiting indefinitely for {} to be available", routeFile);
+            }
+
             WatchKey watchKey = watchService.poll(1, TimeUnit.SECONDS);
 
             if (watchKey == null) {
@@ -158,7 +182,7 @@ public class WorkerMain implements Callable<Integer> {
                 }
             }
             watchKey.reset();
-        } while (!routeFile.exists() && retries-- > 0);
+        } while (!isFileAvailable(routeFile, retries--, waitForever));
 
         return routeFile.exists();
     }
@@ -170,7 +194,7 @@ public class WorkerMain implements Callable<Integer> {
             return 1;
         }
 
-        if (!waitForFile(new File(file))) {
+        if (!waitForFile(new File(file), waitForever)) {
             return 2;
         }
 
