@@ -92,7 +92,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private Deployment makeDesiredServiceDeployment(Acquisition acquisition, String deploymentName, String ns,
             String configMapName) {
         Deployment desiredServiceDeployment =
-                ReconcilerUtils.loadYaml(Deployment.class, getClass(), "acquisition-service-deployment.yaml");
+                ReconcilerUtils.loadYaml(Deployment.class, getClass(), "service-deployment.yaml");
 
         desiredServiceDeployment.getMetadata().setName(deploymentName);
         desiredServiceDeployment.getMetadata().setNamespace(ns);
@@ -158,7 +158,8 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh", "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
                         "-f", DATA_DIR + "/route.yaml",
                         "-d", dependencies,
-                        "--produces-to", acquisitionStep.getProducesTo()));
+                        "--produces-to", acquisitionStep.getProducesTo(),
+                        "--wait"));
     }
 
 
