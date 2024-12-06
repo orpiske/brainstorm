@@ -17,13 +17,8 @@
 
 package org.brainstorm.api.pipeline.acquisition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class AcquisitionStep {
     private String producesTo;
-    private String file;
-    private List<String> dependencies = new ArrayList<>();
 
     public String getProducesTo() {
         return producesTo;
@@ -33,28 +28,10 @@ public class AcquisitionStep {
         this.producesTo = producesTo;
     }
 
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
-    public List<String> getDependencies() {
-        return dependencies;
-    }
-
-    public void setDependencies(List<String> dependencies) {
-        this.dependencies = dependencies;
-    }
-
     @Override
     public String toString() {
         return "AcquisitionStep{" +
                 "producesTo='" + producesTo + '\'' +
-                ", file='" + file + '\'' +
-                ", dependencies=" + dependencies +
                 '}';
     }
 }
