@@ -2,7 +2,6 @@ package org.brainstorm.pipeline;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 
@@ -10,9 +9,7 @@ import io.fabric8.kubernetes.api.model.ConfigMapVolumeSourceBuilder;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
-import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
@@ -183,7 +180,6 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
             return;
         }
 
-        String dependencies = acquisitionStep.getDependencies().stream().collect(Collectors.joining(","));
         final List<Container> containers = spec
                 .getTemplate()
                 .getSpec()
@@ -191,10 +187,13 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
         final Container runner = containers.stream().filter(c -> c.getName().equals("camel-runner")).findFirst().get();
 
+        EnvVar dataDir = new EnvVarBuilder().withName("CAMEL_WORKER_CP").withValue(DATA_DIR).build();
+        runner.setEnv(List.of(dataDir));
+
         runner
-                .setCommand(List.of("/opt/brainstorm/worker/run.sh", "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
+                .setCommand(List.of("/opt/brainstorm/worker/run.sh",
+                        "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
                         "-f", DATA_DIR + "/route.yaml",
-                        "-d", dependencies,
                         "--produces-to", acquisitionStep.getProducesTo(),
                         "--wait"));
     }
