@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:17-ubi9-minimal as base
+FROM eclipse-temurin:21-ubi9-minimal as base
 LABEL maintainer="orpiske@apache.org"
 RUN mkdir -p /opt/brainstorm/worker
 ADD target/run.sh /opt/brainstorm/worker/run.sh
