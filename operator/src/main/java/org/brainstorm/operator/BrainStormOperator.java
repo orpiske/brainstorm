@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import io.javaoperatorsdk.operator.Operator;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
-import org.brainstorm.pipeline.AcquisitionReconciler;
 
 public class BrainStormOperator implements QuarkusApplication {
     @Inject
