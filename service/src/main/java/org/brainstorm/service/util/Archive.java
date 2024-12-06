@@ -30,8 +30,11 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.jboss.logging.Logger;
 
 public final class Archive {
+    private static final Logger LOG = Logger.getLogger(Archive.class);
+
     public static void decompress(Path path, File targetDir) throws IOException {
         try (InputStream fi = Files.newInputStream(path);
              InputStream bi = new BufferedInputStream(fi);
@@ -41,11 +44,16 @@ public final class Archive {
 
             while ((entry = i.getNextEntry()) != null) {
                 if (!i.canReadEntryData(entry)) {
-                    // log something?
+                    LOG.warnf("Failed to read entry '%s'", entry.getName());
                     continue;
                 }
                 File f = new File(targetDir, entry.getName());
 
+                if (f.exists()) {
+                    if (!f.delete()) {
+                        LOG.warnf("Failed to delete file or directory '%s'", f.getAbsolutePath());
+                    }
+                }
 
                 if (entry.isDirectory()) {
                     if (!f.isDirectory() && !f.mkdirs()) {
