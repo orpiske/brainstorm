@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: ""
+        component: "acquisition-worker"
     spec:
       containers:
         - name: camel-runner

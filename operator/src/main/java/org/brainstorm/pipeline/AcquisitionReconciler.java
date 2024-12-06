@@ -1,7 +1,7 @@
 package org.brainstorm.pipeline;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -10,6 +10,10 @@ import io.fabric8.kubernetes.api.model.ConfigMapVolumeSourceBuilder;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -77,7 +81,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         try {
             existingDeployment = context.getSecondaryResource(Deployment.class).orElse(null);
         } catch (Exception e) {
-            LOG.warnf("There is not existing deployment");
+            LOG.warnf("There is no existing deployment");
             existingDeployment = null;
         }
 
@@ -85,6 +89,21 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
             LOG.infof("Creating or updating Deployment %s in %s", desiredDeployment.getMetadata().getName(), ns);
 
             kubernetesClient.apps().deployments().inNamespace(ns).resource(desiredDeployment)
+                    .createOr(Replaceable::update);
+        }
+
+        final Service desiredExternalService = makeServiceExternalService(resource, deploymentName, ns);
+        Service existingExternalService;
+        try {
+            existingExternalService = context.getSecondaryResource(Service.class).orElse(null);
+        } catch (Exception e) {
+            LOG.warnf("There is no existing service");
+            existingExternalService = null;
+        }
+        if (!match(desiredExternalService, existingExternalService)) {
+            LOG.infof("Creating or updating Service %s in %s", desiredExternalService.getMetadata().getName(), ns);
+
+            kubernetesClient.services().inNamespace(ns).resource(desiredExternalService)
                     .createOr(Replaceable::update);
         }
     }
@@ -100,7 +119,9 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         final DeploymentSpec serviceSpec = desiredServiceDeployment.getSpec();
 
         serviceSpec.getSelector().getMatchLabels().put("app", deploymentName);
+        serviceSpec.getSelector().getMatchLabels().put("component", "service");
         serviceSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
+        serviceSpec.getTemplate().getMetadata().getLabels().put("component", "service");
         serviceSpec.getTemplate()
                 .getSpec()
                 .getVolumes()
@@ -108,10 +129,24 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
         desiredServiceDeployment.addOwnerReference(acquisition);
-
         setupBackendContainer(acquisition, serviceSpec);
 
         return desiredServiceDeployment;
+    }
+
+    private Service makeServiceExternalService(Acquisition acquisition, String deploymentName, String ns) {
+        Service service = ReconcilerUtils.loadYaml(Service.class, getClass(), "service-external-service.yaml");
+
+        LOG.infof("Creating new external service for deployment: %s", deploymentName);
+        service.getMetadata().setName("external-" + deploymentName);
+        service.getMetadata().setNamespace(ns);
+
+        ServiceSpec serviceSpec = service.getSpec();
+        serviceSpec.setSelector(Map.of("app", deploymentName, "component", "service"));
+
+        service.addOwnerReference(acquisition);
+
+        return service;
     }
 
     private Deployment makeDesiredAcquisitionDeployment(Acquisition acquisition, String deploymentName, String ns,
@@ -125,7 +160,9 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         final DeploymentSpec runnerSpec = desiredRunnerDeployment.getSpec();
 
         runnerSpec.getSelector().getMatchLabels().put("app", deploymentName);
+        runnerSpec.getSelector().getMatchLabels().put("component", "acquisition-worker");
         runnerSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
+        runnerSpec.getTemplate().getMetadata().getLabels().put("component", "acquisition-worker");
         runnerSpec.getTemplate()
                 .getSpec()
                 .getVolumes()
@@ -190,5 +227,19 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                             .equals(
                                     deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage());
         }
+    }
+
+    public boolean match(Service desiredService, Service existingService) {
+        if (existingService == null) {
+            return false;
+        }
+
+        final ServiceSpec existingSpec = existingService.getSpec();
+        final ServiceSpec desiredSpec = desiredService.getSpec();
+
+        return existingSpec.getExternalName().equals(desiredSpec.getExternalName())
+                && existingSpec.getPorts().equals(desiredSpec.getPorts());
+
+
     }
 }
