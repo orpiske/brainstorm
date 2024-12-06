@@ -20,9 +20,7 @@ package org.brainstorm.cli.main;
 import jakarta.inject.Inject;
 
 import io.quarkus.picocli.runtime.annotations.TopCommand;
-import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
-import io.quarkus.runtime.annotations.QuarkusMain;
 import org.brainstorm.cli.command.Package;
 import picocli.CommandLine;
 
