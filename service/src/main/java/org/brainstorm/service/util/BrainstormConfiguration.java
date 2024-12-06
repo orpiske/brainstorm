@@ -11,7 +11,13 @@ public interface BrainstormConfiguration {
 
     Data data();
 
+    Cache cache();
+
     interface Data {
+        String path();
+    }
+
+    interface Cache {
         String path();
     }
 

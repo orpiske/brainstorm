@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.concurrent.Executors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -31,6 +31,7 @@ import jakarta.inject.Inject;
 
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.context.SmallRyeManagedExecutor;
+import org.brainstorm.service.util.Archive;
 import org.brainstorm.service.util.BrainstormConfiguration;
 import org.jboss.logging.Logger;
 
@@ -72,5 +73,21 @@ public class AcquisitionController {
         LOG.info("Executing pipeline internally (blocking)");
 
         managedExecutor.execute(() -> add(route));
+    }
+
+    private void decompress(Path filePath) {
+        final String path = configuration.data().path();
+
+        try {
+            Archive.decompress(filePath, new File(path));
+        } catch (IOException e) {
+            LOG.error("I/O error trying to decompress: %s", filePath, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @ConsumeEvent(value = "package", blocking = true)
+    public void consumePackage(Path filePath) {
+        managedExecutor.execute(() -> decompress(filePath));
     }
 }

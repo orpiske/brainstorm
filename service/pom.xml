@@ -35,6 +35,7 @@
 
         <langchain4j.version>0.35.0</langchain4j.version>
         <vaadin.version>24.4.9</vaadin.version>
+        <commons-compress.version>1.27.1</commons-compress.version>
 
         <quarkus.langchain.version>0.20.1</quarkus.langchain.version>
         <quarkus.jackson.version>2.17.2</quarkus.jackson.version>
@@ -106,10 +107,10 @@
             <artifactId>quarkus-hibernate-orm-panache</artifactId>
         </dependency>
 
-        <!-- JDBC driver dependencies -->
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-h2</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
         </dependency>
 
         <dependency>
