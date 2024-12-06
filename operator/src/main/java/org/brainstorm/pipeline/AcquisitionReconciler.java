@@ -187,17 +187,24 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
         final Container runner = containers.stream().filter(c -> c.getName().equals("camel-runner")).findFirst().get();
 
-        EnvVar dataDir = new EnvVarBuilder().withName("CAMEL_WORKER_CP").withValue(DATA_DIR).build();
+        EnvVar dataDir = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
         runner.setEnv(List.of(dataDir));
 
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "-f", DATA_DIR + "/route.yaml",
+                        "--file", routePath(),
                         "--produces-to", acquisitionStep.getProducesTo(),
                         "--wait"));
     }
 
+    private static String classpathPath() {
+        return DATA_DIR + "/classpath";
+    }
+
+    private static String routePath() {
+        return DATA_DIR + "/acquisition/routes.yaml";
+    }
 
     private static void setupBackendContainer(Acquisition acquisition, DeploymentSpec spec) {
         final List<Container> containers = spec
