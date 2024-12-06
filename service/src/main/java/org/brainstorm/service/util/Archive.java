@@ -27,6 +27,7 @@ import java.nio.file.Path;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
@@ -36,7 +37,7 @@ public final class Archive {
         try (InputStream fi = Files.newInputStream(path);
              InputStream bi = new BufferedInputStream(fi);
              InputStream gzi = new GzipCompressorInputStream(bi);
-             ArchiveInputStream i = new TarArchiveInputStream(gzi)) {
+             ArchiveInputStream<TarArchiveEntry> i = new TarArchiveInputStream(gzi)) {
             ArchiveEntry entry = null;
 
             while ((entry = i.getNextEntry()) != null) {
@@ -45,6 +46,8 @@ public final class Archive {
                     continue;
                 }
                 File f = new File(targetDir, entry.getName());
+
+
                 if (entry.isDirectory()) {
                     if (!f.isDirectory() && !f.mkdirs()) {
                         throw new IOException("failed to create directory " + f);
