@@ -16,54 +16,58 @@
  */
 package org.brainstorm.cli.common;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.jboss.logging.Logger;
 
-/**
- * Zip archive support
- * 
- * @author Otavio R. Piske <angusyoung@gmail.com>
- */
+
 public class Archive {
+	private static final Logger LOG = Logger.getLogger(Archive.class);
 
-	private final List<File> filesToArchive;
-	private final String name;
+	private final List<BrainstormEntry> filesToArchive;
 
-	public Archive(List<File> filesToArchive, String name) {
+	public Archive(List<BrainstormEntry> filesToArchive) {
 		this.filesToArchive = filesToArchive;
-        this.name = name;
     }
 
 	public Path compress() throws IOException {
-		final Path path = Paths.get(name);
+		final Path path = Files.createTempFile("brainstorm", ".tar.gz");
+		LOG.infof("Compressing %d files to %s", filesToArchive.size(), path);
+
+		path.toFile().deleteOnExit();
 
 		try (OutputStream fo = Files.newOutputStream(path);
 			 OutputStream gzo = new GzipCompressorOutputStream(fo);
-			 ArchiveOutputStream o = new TarArchiveOutputStream(gzo)) {
+			 ArchiveOutputStream<TarArchiveEntry> o = new TarArchiveOutputStream(gzo)) {
 
-			for (File f : filesToArchive) {
+			for (BrainstormEntry bsEntry : filesToArchive) {
 				// maybe skip directories for formats like AR that don't store directories
-				ArchiveEntry entry = o.createArchiveEntry(f, f.getName());
+				TarArchiveEntry entry;
+				if (bsEntry.getType() == BrainstormEntry.EntryType.ACQUISITION) {
+					entry = o.createArchiveEntry(bsEntry.getFile(), "acquisition" + File.separator + bsEntry.getFile().getName());
+				} else {
+					if (bsEntry.getType() == BrainstormEntry.EntryType.CODE) {
+						entry = o.createArchiveEntry(bsEntry.getFile(), "classpath" + File.separator + bsEntry.getFile().getName());
+					} else {
+						entry = o.createArchiveEntry(bsEntry.getFile(), "other" + File.separator + bsEntry.getFile().getName());
+					}
+				}
+
 				// potentially add more flags to entry
 				o.putArchiveEntry(entry);
-				if (f.isFile()) {
-					try (InputStream i = Files.newInputStream(f.toPath())) {
+				if (bsEntry.getFile().isFile()) {
+					try (InputStream i = Files.newInputStream(bsEntry.getFile().toPath())) {
 						IOUtils.copy(i, o);
 					}
 				}

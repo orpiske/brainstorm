@@ -23,12 +23,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import org.brainstorm.cli.common.Archive;
+import org.brainstorm.cli.common.BrainstormEntry;
 import org.brainstorm.cli.services.AcquisitionService;
 import picocli.CommandLine;
 
@@ -48,9 +50,13 @@ public class Package extends BaseCommand {
 
     @Override
     public void run() {
-        final List<File> files = Stream.of(addPackage, ingestion).map(File::new).collect(Collectors.toList());
+        List<BrainstormEntry> packageFiles = new ArrayList<>();
 
-        Archive archive = new Archive(files, "bs-package.tar.gz");
+        packageFiles.add(new BrainstormEntry(BrainstormEntry.EntryType.ACQUISITION, ingestion));
+        packageFiles.add(new BrainstormEntry(BrainstormEntry.EntryType.CODE, addPackage));
+
+
+        Archive archive = new Archive(packageFiles);
         try {
             Path path = archive.compress();
 
