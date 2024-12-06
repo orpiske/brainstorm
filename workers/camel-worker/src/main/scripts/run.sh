@@ -18,4 +18,6 @@
 install_path=$(dirname $0)
 jar_file=camel-worker-jar-with-dependencies.jar
 
-java -jar ${install_path}/${jar_file} "$@"
+CAMEL_WORKER_CP=${CAMEL_WORKER_CP:-/opt/brainstorm/data/classpath/*.jar}
+
+java -cp ${CAMEL_WORKER_CP}:${install_path}/${jar_file} org.brainstorm.worker.main.WorkerMain "$@"

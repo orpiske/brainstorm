@@ -38,7 +38,7 @@ public class WorkerMain implements Callable<Integer> {
     @CommandLine.Option(names = {"-f", "--file"}, description = "The integration file to use", required = true)
     private String file;
 
-    @CommandLine.Option(names = {"-d", "--dependencies"}, description = "The list of dependencies to include in runtime (comma-separated)", required = true)
+    @CommandLine.Option(names = {"-d", "--dependencies"}, description = "The list of dependencies to include in runtime (comma-separated)")
     private String dependenciesList;
 
     @CommandLine.Option(names = {"-s", "--bootstrap-server"}, description = "The Kafka bootstrap server to use", required = true)
@@ -85,13 +85,16 @@ public class WorkerMain implements Callable<Integer> {
         final DependencyDownloaderClassLoader cl = createClassLoader();
         final MavenDependencyDownloader downloader = createDownloader(cl);
 
-        final String[] dependencies = dependenciesList.split(",");
-        for (String dependency : dependencies) {
-            downloader.downloadDependency(GavUtil.group(dependency), GavUtil.artifact(dependency), GavUtil.version(dependency));
-        }
-        Thread.currentThread().setContextClassLoader(cl);
+        if (dependenciesList != null) {
+            final String[] dependencies = dependenciesList.split(",");
+            for (String dependency : dependencies) {
+                downloader.downloadDependency(GavUtil.group(dependency), GavUtil.artifact(dependency), GavUtil.version(dependency));
+            }
 
-        cl.getDownloaded().forEach(d -> LOG.debug("Downloaded {}", d));
+            cl.getDownloaded().forEach(d -> LOG.debug("Downloaded {}", d));
+        }
+
+        Thread.currentThread().setContextClassLoader(cl);
         camelContextExtension.addContextPlugin(DependencyDownloader.class, downloader);
     }
 
@@ -104,6 +107,7 @@ public class WorkerMain implements Callable<Integer> {
 
     private static DependencyDownloaderClassLoader createClassLoader() {
         final ClassLoader parentCL = WorkerMain.class.getClassLoader();
+
         return new DependencyDownloaderClassLoader(parentCL);
     }
 
