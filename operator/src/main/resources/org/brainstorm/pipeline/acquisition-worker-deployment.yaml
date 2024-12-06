@@ -19,10 +19,12 @@ spec:
           command:
             -
           volumeMounts:
-            - name: shared-volume
+            - name: brainstorm-volume
               mountPath: /opt/brainstorm/data
       volumes:
         - name: camel-config-volume
           configMap:
             name: ""
-        - name: shared-volume
+        - name: brainstorm-volume
+          persistentVolumeClaim:
+            claimName: brainstorm-volume-claim
