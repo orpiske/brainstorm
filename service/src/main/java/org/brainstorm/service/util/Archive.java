@@ -30,7 +30,6 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.IOUtils;
 
 public final class Archive {
     public static void decompress(Path path, File targetDir) throws IOException {
@@ -58,7 +57,7 @@ public final class Archive {
                         throw new IOException("failed to create directory " + parent);
                     }
                     try (OutputStream o = Files.newOutputStream(f.toPath())) {
-                        IOUtils.copy(i, o);
+                        i.transferTo(o);
                     }
                 }
             }
