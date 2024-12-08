@@ -66,6 +66,7 @@
 
         <snakeyaml.version>2.3</snakeyaml.version>
         <commons-compress.version>1.27.1</commons-compress.version>
+        <jib-core.version>0.27.2</jib-core.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +122,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>${commons-compress.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-core</artifactId>
+            <version>${jib-core.version}</version>
         </dependency>
 
     </dependencies>

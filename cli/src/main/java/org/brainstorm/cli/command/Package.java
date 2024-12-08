@@ -17,7 +17,6 @@
 
 package org.brainstorm.cli.command;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,8 +24,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import org.brainstorm.cli.common.Archive;
@@ -35,7 +32,7 @@ import org.brainstorm.cli.services.AcquisitionService;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "package",
-        description = "Create a new brainstorm package", sortOptions = false)
+        description = "Create a new brainstorm package", sortOptions = false, subcommands = {PackageAcquisitionWorker.class, PackageTransformationRunner.class})
 public class Package extends BaseCommand {
     @CommandLine.Option(names = {"--package"}, description = "", arity = "0..1")
     private String addPackage;
