@@ -13,11 +13,14 @@ import com.google.cloud.tools.jib.api.JibContainerBuilder;
 import com.google.cloud.tools.jib.api.RegistryException;
 import com.google.cloud.tools.jib.api.RegistryImage;
 import com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath;
+import org.jboss.logging.Logger;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "acquisition",
         description = "Create a new brainstorm package for an acquisition worker", sortOptions = false)
 public class PackageAcquisitionWorker extends PackageWorker {
+    private static final Logger LOG = Logger.getLogger(PackageAcquisitionWorker.class);
+
     private static final String BASE_DIR = "/opt/brainstorm/";
     private static final String ACQUISITION_DIR = BASE_DIR + "/acquisition";
     private static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
@@ -39,6 +42,7 @@ public class PackageAcquisitionWorker extends PackageWorker {
     public void run() {
 
         try {
+            LOG.debugf("Building based on %s", baseImage);
             final JibContainerBuilder jibContainerBuilder = Jib.from(baseImage)
                     .addLayer(List.of(Paths.get(ingestion)), AbsoluteUnixPath.get(ACQUISITION_DIR));
 
