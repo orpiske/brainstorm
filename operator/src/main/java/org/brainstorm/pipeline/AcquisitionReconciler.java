@@ -1,5 +1,6 @@
 package org.brainstorm.pipeline;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,10 @@ import org.jboss.logging.Logger;
 public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private static final Logger LOG = Logger.getLogger(AcquisitionReconciler.class);
     public static final String BASE_DIR = "/opt/brainstorm";
+    public static final String CLASSPATH_DIR = BASE_DIR +"/classpath";
     public static final String DATA_DIR = BASE_DIR +"/data";
     public static final String ACQUISITION_DIR = BASE_DIR +"/acquisition";
+    public static final String STEP_DIR = BASE_DIR +"/step";
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -49,13 +52,13 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         String deploymentName = resource.getMetadata().getName();
 
         deployService(resource, context, "service", ns);
-        deployRunner(resource, context, deploymentName, ns);
+        deployAcquisitionRunner(resource, context, deploymentName, ns);
         deployTransformations(resource, context, deploymentName, ns);
 
         return UpdateControl.noUpdate();
     }
 
-    private void deployRunner(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
+    private void deployAcquisitionRunner(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
         final Deployment desiredDeployment = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
                 "bs-config");
 
@@ -283,12 +286,17 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "--consumesFrom", transformationStep.getConsumesFrom(),
+                        "--script", transformationStep.getScript(),
+                        "--consumes-from", transformationStep.getConsumesFrom(),
                         "--produces-to", transformationStep.getProducesTo()));
     }
 
+    private static String stepPath(String script) {
+        return STEP_DIR + File.separator + script;
+    }
+
     private static String classpathPath() {
-        return DATA_DIR + "/classpath";
+        return CLASSPATH_DIR;
     }
 
     private static String routePath() {

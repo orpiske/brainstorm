@@ -22,6 +22,7 @@ import java.util.Objects;
 public class TransformationStep {
     private String name;
     private String image;
+    private String script;
     private String consumesFrom;
     private String producesTo;
 
@@ -57,6 +58,14 @@ public class TransformationStep {
         this.producesTo = producesTo;
     }
 
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -64,12 +73,13 @@ public class TransformationStep {
         }
         TransformationStep that = (TransformationStep) o;
         return Objects.equals(name, that.name) && Objects.equals(image, that.image) && Objects.equals(
-                consumesFrom, that.consumesFrom) && Objects.equals(producesTo, that.producesTo);
+                script, that.script) && Objects.equals(consumesFrom, that.consumesFrom) && Objects.equals(
+                producesTo, that.producesTo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, image, consumesFrom, producesTo);
+        return Objects.hash(name, image, script, consumesFrom, producesTo);
     }
 
     @Override
@@ -77,6 +87,7 @@ public class TransformationStep {
         return "TransformationStep{" +
                 "name='" + name + '\'' +
                 ", image='" + image + '\'' +
+                ", script='" + script + '\'' +
                 ", consumesFrom='" + consumesFrom + '\'' +
                 ", producesTo='" + producesTo + '\'' +
                 '}';
