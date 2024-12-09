@@ -3,6 +3,7 @@
 REGISTRY:=docker.io
 ORGANIZATION=otavio021
 VERSION_TAG:=latest
+KUBECTL:=kubectl
 
 build:
 	mvn -Dquarkus.container-image.build=true -Dquarkus.container-image.registry=$(REGISTRY) -Dquarkus.container-image.group=$(ORGANIZATION) -Dquarkus.container-image.tag=$(VERSION_TAG) package
@@ -17,3 +18,6 @@ push:
 	podman push $(REGISTRY)/$(ORGANIZATION)/camel-worker:$(VERSION_TAG)
 	podman push $(REGISTRY)/$(ORGANIZATION)/runner-worker:$(VERSION_TAG)
 
+
+prepare-cluster:
+	$(KUBECTL) apply -f operator/samples/kind-pv-sample.yaml
