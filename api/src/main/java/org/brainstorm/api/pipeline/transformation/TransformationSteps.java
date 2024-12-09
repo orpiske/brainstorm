@@ -20,7 +20,7 @@ package org.brainstorm.api.pipeline.transformation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Transformation {
+public class TransformationSteps {
     private List<TransformationStep> steps = new ArrayList<>();
 
     public List<TransformationStep> getSteps() {

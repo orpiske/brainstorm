@@ -20,11 +20,15 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
+import org.brainstorm.api.pipeline.transformation.TransformationStep;
+import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 import org.jboss.logging.Logger;
 
 public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private static final Logger LOG = Logger.getLogger(AcquisitionReconciler.class);
-    public static final String DATA_DIR = "/opt/brainstorm/data";
+    public static final String BASE_DIR = "/opt/brainstorm";
+    public static final String DATA_DIR = BASE_DIR +"/data";
+    public static final String ACQUISITION_DIR = BASE_DIR +"/acquisition";
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -46,6 +50,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
         deployService(resource, context, "service", ns);
         deployRunner(resource, context, deploymentName, ns);
+        deployTransformations(resource, context, deploymentName, ns);
 
         return UpdateControl.noUpdate();
     }
@@ -67,6 +72,30 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
             kubernetesClient.apps().deployments().inNamespace(ns).resource(desiredDeployment)
                     .createOr(Replaceable::update);
+        }
+    }
+
+    private void deployTransformations(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
+        final List<TransformationStep> steps = resource.getSpec().getTransformationSteps().getSteps();
+
+        for (TransformationStep step : steps) {
+            final Deployment desiredDeployment = makeDesiredTransformationDeployment(resource, step.getName(), ns,
+                    "bs-config", step);
+
+            Deployment existingDeployment;
+            try {
+                existingDeployment = context.getSecondaryResource(Deployment.class).orElse(null);
+            } catch (Exception e) {
+                LOG.warnf("There is not existing deployment");
+                existingDeployment = null;
+            }
+
+            if (!match(desiredDeployment, existingDeployment)) {
+                LOG.infof("Creating or updating Deployment %s in %s", desiredDeployment.getMetadata().getName(), ns);
+
+                kubernetesClient.apps().deployments().inNamespace(ns).resource(desiredDeployment)
+                        .createOr(Replaceable::update);
+            }
         }
     }
 
@@ -160,6 +189,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         runnerSpec.getSelector().getMatchLabels().put("component", "acquisition-worker");
         runnerSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
         runnerSpec.getTemplate().getMetadata().getLabels().put("component", "acquisition-worker");
+
         runnerSpec.getTemplate()
                 .getSpec()
                 .getVolumes()
@@ -187,6 +217,10 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
         final Container runner = containers.stream().filter(c -> c.getName().equals("camel-runner")).findFirst().get();
 
+        final String image = acquisition.getSpec().getAcquisitionStep().getImage();
+        LOG.infof("Building a new acquisition container using %s", image);
+        runner.setImage(image);
+
         EnvVar dataDir = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
         runner.setEnv(List.of(dataDir));
 
@@ -198,12 +232,67 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                         "--wait"));
     }
 
+    private Deployment makeDesiredTransformationDeployment(Acquisition acquisition, String deploymentName, String ns,
+            String configMapName, TransformationStep transformationStep) {
+        Deployment desiredRunnerDeployment =
+                ReconcilerUtils.loadYaml(Deployment.class, getClass(), "runner-worker-deployment.yaml");
+
+        desiredRunnerDeployment.getMetadata().setName(deploymentName);
+        desiredRunnerDeployment.getMetadata().setNamespace(ns);
+
+        final DeploymentSpec runnerSpec = desiredRunnerDeployment.getSpec();
+
+        runnerSpec.getSelector().getMatchLabels().put("app", deploymentName);
+        runnerSpec.getSelector().getMatchLabels().put("component", "runner-worker");
+        runnerSpec.getSelector().getMatchLabels().put("step", transformationStep.getConsumesFrom());
+        runnerSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
+        runnerSpec.getTemplate().getMetadata().getLabels().put("component", "runner-worker");
+        runnerSpec.getTemplate().getMetadata().getLabels().put("step", transformationStep.getConsumesFrom());
+
+        runnerSpec.getTemplate()
+                .getSpec()
+                .getVolumes()
+                .get(0)
+                .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
+
+        desiredRunnerDeployment.addOwnerReference(acquisition);
+
+        setupTransformationContainer(acquisition, runnerSpec, transformationStep);
+
+        return desiredRunnerDeployment;
+    }
+
+    private static void setupTransformationContainer(Acquisition acquisition, DeploymentSpec spec, TransformationStep transformationStep) {
+        final TransformationSteps transformationSteps = acquisition.getSpec().getTransformationSteps();
+        if (transformationSteps == null) {
+            LOG.warnf("Invalid transformation steps for acquisition  %s", acquisition);
+            return;
+        }
+
+        final List<Container> containers = spec
+                .getTemplate()
+                .getSpec()
+                .getContainers();
+
+        final Container runner = containers.stream().filter(c -> c.getName().equals("runner-worker")).findFirst().get();
+
+        final String image = transformationStep.getImage();
+        LOG.infof("Building a new acquisition container using %s", image);
+        runner.setImage(image);
+
+        runner
+                .setCommand(List.of("/opt/brainstorm/worker/run.sh",
+                        "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
+                        "--consumesFrom", transformationStep.getConsumesFrom(),
+                        "--produces-to", transformationStep.getProducesTo()));
+    }
+
     private static String classpathPath() {
         return DATA_DIR + "/classpath";
     }
 
     private static String routePath() {
-        return DATA_DIR + "/acquisition/routes.yaml";
+        return ACQUISITION_DIR + "/routes.yaml";
     }
 
     private static void setupBackendContainer(Acquisition acquisition, DeploymentSpec spec) {

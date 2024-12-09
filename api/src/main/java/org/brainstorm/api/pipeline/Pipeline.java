@@ -18,11 +18,11 @@
 package org.brainstorm.api.pipeline;
 
 import org.brainstorm.api.pipeline.acquisition.Acquisition;
-import org.brainstorm.api.pipeline.transformation.Transformation;
+import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 
 public class Pipeline {
     private Acquisition acquisition;
-    private Transformation transformation;
+    private TransformationSteps transformation;
 
     public Acquisition getAcquisition() {
         return acquisition;
@@ -32,11 +32,11 @@ public class Pipeline {
         this.acquisition = acquisition;
     }
 
-    public Transformation getTransformation() {
+    public TransformationSteps getTransformation() {
         return transformation;
     }
 
-    public void setTransformation(Transformation transformation) {
+    public void setTransformation(TransformationSteps transformation) {
         this.transformation = transformation;
     }
 

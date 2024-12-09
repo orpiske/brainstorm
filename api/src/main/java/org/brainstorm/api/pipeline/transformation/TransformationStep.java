@@ -17,17 +17,28 @@
 
 package org.brainstorm.api.pipeline.transformation;
 
-public class TransformationStep {
-    private String producesTo;
-    private String consumesFrom;
-    private String script;
+import java.util.Objects;
 
-    public String getProducesTo() {
-        return producesTo;
+public class TransformationStep {
+    private String name;
+    private String image;
+    private String consumesFrom;
+    private String producesTo;
+
+    public String getName() {
+        return name;
     }
 
-    public void setProducesTo(String producesTo) {
-        this.producesTo = producesTo;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getConsumesFrom() {
@@ -38,20 +49,36 @@ public class TransformationStep {
         this.consumesFrom = consumesFrom;
     }
 
-    public String getScript() {
-        return script;
+    public String getProducesTo() {
+        return producesTo;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setProducesTo(String producesTo) {
+        this.producesTo = producesTo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TransformationStep that = (TransformationStep) o;
+        return Objects.equals(name, that.name) && Objects.equals(image, that.image) && Objects.equals(
+                consumesFrom, that.consumesFrom) && Objects.equals(producesTo, that.producesTo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, image, consumesFrom, producesTo);
     }
 
     @Override
     public String toString() {
         return "TransformationStep{" +
-                "producesTo='" + producesTo + '\'' +
+                "name='" + name + '\'' +
+                ", image='" + image + '\'' +
                 ", consumesFrom='" + consumesFrom + '\'' +
-                ", script='" + script + '\'' +
+                ", producesTo='" + producesTo + '\'' +
                 '}';
     }
 }

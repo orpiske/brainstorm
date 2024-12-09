@@ -18,7 +18,16 @@
 package org.brainstorm.api.pipeline.acquisition;
 
 public class AcquisitionStep {
+    private String image;
     private String producesTo;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public String getProducesTo() {
         return producesTo;
@@ -31,7 +40,8 @@ public class AcquisitionStep {
     @Override
     public String toString() {
         return "AcquisitionStep{" +
-                "producesTo='" + producesTo + '\'' +
+                "image='" + image + '\'' +
+                ", producesTo='" + producesTo + '\'' +
                 '}';
     }
 }

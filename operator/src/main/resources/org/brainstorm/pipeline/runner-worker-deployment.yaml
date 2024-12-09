@@ -11,10 +11,10 @@ spec:
     metadata:
       labels:
         app: ""
-        component: "acquisition-worker"
+        component: "runner-worker"
     spec:
       containers:
-        - name: camel-runner
+        - name: runner-worker
           image: ""
           command:
             -
@@ -22,7 +22,7 @@ spec:
             - name: brainstorm-volume
               mountPath: /opt/brainstorm/data
       volumes:
-        - name: camel-config-volume
+        - name: runner-config-volume
           configMap:
             name: ""
         - name: brainstorm-volume
