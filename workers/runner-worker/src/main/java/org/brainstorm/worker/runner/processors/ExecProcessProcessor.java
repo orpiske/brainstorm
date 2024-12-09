@@ -17,10 +17,13 @@
 
 package org.brainstorm.worker.runner.processors;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,15 @@ public class ExecProcessProcessor implements Processor {
             if (i != 0) {
                 LOG.warn("Transformation did not complete successfully");
             }
+
+            File scriptFile = new File(script);
+            File stepOut = new File(scriptFile.getParentFile(), "step.out");
+            if (stepOut.exists()) {
+                LOG.info("A step.out file exists, therefore using it to set the body");
+                final String stepOutData = FileUtils.readFileToString(stepOut, StandardCharsets.UTF_8);
+                exchange.getIn().setBody(stepOutData);
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
