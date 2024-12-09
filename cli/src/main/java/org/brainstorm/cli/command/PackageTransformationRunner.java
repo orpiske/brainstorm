@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.command.PushImageResultCallback;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import com.google.cloud.tools.jib.api.CacheDirectoryCreationException;
 import com.google.cloud.tools.jib.api.Containerizer;
@@ -108,6 +110,7 @@ public class PackageTransformationRunner extends PackageWorker {
             LOG.errorf("There is no Dockerfile at %s", dockerfile.getAbsolutePath());
         }
 
+        LOG.infof("Building image %s", outputImage);
         String imageId = dockerClient
                 .buildImageCmd()
                 .withDockerfile(dockerfile)
@@ -117,6 +120,14 @@ public class PackageTransformationRunner extends PackageWorker {
                 .withTag(outputImage)
                 .exec(new BuildImageResultCallback())
                 .awaitImageId();
+
+        try {
+            LOG.infof("Pushing image %s", outputImage);
+            dockerClient.pushImageCmd(outputImage)
+                    .exec(new ResultCallback.Adapter<>()).awaitCompletion();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         LOG.infof("Built image %s", imageId);
 
