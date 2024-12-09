@@ -15,10 +15,14 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:21-ubi9-minimal as base
+FROM fedora:40 as base
 LABEL maintainer="orpiske@apache.org"
-RUN mkdir -p /opt/brainstorm/worker
-ADD target/run.sh /opt/brainstorm/worker/run.sh
-ADD target/runner-worker-jar-with-dependencies.jar /opt/brainstorm/worker/
-RUN chmod +x opt/brainstorm/worker/run.sh
-CMD opt/brainstorm/worker/run.sh
+RUN dnf install -y java-21-openjdk-headless && \
+    mkdir -p /opt/brainstorm/data && \
+    mkdir -p /opt/brainstorm/step && \
+    dnf clean all
+VOLUME /opt/brainstorm/data
+WORKDIR /opt/brainstorm/worker/
+COPY --chmod=755 target/run.sh .
+COPY --chmod=644 target/runner-worker-jar-with-dependencies.jar ./
+CMD /opt/brainstorm/worker/run.sh
