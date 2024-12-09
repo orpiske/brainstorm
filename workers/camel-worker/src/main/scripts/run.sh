@@ -18,9 +18,9 @@
 install_path=$(dirname $0)
 jar_file=camel-worker-jar-with-dependencies.jar
 
-WORKER_CP=${WORKER_CP:-/opt/brainstorm/data/}
+WORKER_CP=${WORKER_CP:-/opt/brainstorm/classpath/}
 mainClass=org.brainstorm.worker.main.WorkerMain
 
-fullClassPath=$(for jarFile in /opt/brainstorm/data/*.jar ; do echo "${jarFile}:" ; done)
+fullClassPath=$(for jarFile in ${WORKER_CP}/*.jar ; do echo "${jarFile}:" ; done)
 
 java -cp "${fullClassPath}""${install_path}"/${jar_file} ${mainClass} "$@"
