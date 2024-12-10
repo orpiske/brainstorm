@@ -21,7 +21,6 @@ spec:
           volumeMounts:
             - name: brainstorm-volume
               mountPath: /opt/brainstorm/data
-          restartPolicy: Never
       volumes:
         - name: runner-config-volume
           configMap:
