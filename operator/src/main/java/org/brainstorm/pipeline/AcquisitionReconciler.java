@@ -32,6 +32,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
     public static final String DATA_DIR = BASE_DIR +"/data";
     public static final String ACQUISITION_DIR = BASE_DIR +"/acquisition";
     public static final String STEP_DIR = BASE_DIR +"/step";
+    public static final String DEFAULT_TRANSFORM_SCRIPT_NAME = "transform.sh";
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -283,12 +284,22 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         LOG.infof("Building a new acquisition container using %s", image);
         runner.setImage(image);
 
+        final String script = getTransformationScript(transformationStep);
+
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "--script", transformationStep.getScript(),
+                        "--script", script,
                         "--consumes-from", transformationStep.getConsumesFrom(),
                         "--produces-to", transformationStep.getProducesTo()));
+    }
+
+    private static String getTransformationScript(TransformationStep transformationStep) {
+        String script = transformationStep.getScript();
+        if (script == null || script.isEmpty()) {
+            script = DEFAULT_TRANSFORM_SCRIPT_NAME;
+        }
+        return stepPath(script);
     }
 
     private static String stepPath(String script) {
