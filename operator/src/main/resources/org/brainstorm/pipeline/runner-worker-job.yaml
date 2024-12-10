@@ -1,12 +1,8 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
-kind: Deployment
+apiVersion: batch/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Job
 metadata:
   name: ""
 spec:
-  selector:
-    matchLabels:
-      app: ""
-  replicas: 1
   template:
     metadata:
       labels:
@@ -16,8 +12,6 @@ spec:
       containers:
         - name: runner-worker
           image: ""
-          command:
-            -
           volumeMounts:
             - name: brainstorm-volume
               mountPath: /opt/brainstorm/data
@@ -28,3 +22,4 @@ spec:
         - name: brainstorm-volume
           persistentVolumeClaim:
             claimName: brainstorm-volume-claim
+      restartPolicy: OnFailure

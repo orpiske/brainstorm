@@ -64,10 +64,8 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private void deployAcquisitionRunner(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
         final Job desiredJob = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
                 "bs-config");
-
-        Job existingJob;
         try {
-            existingJob = context.getSecondaryResource(Job.class).orElse(null);
+            Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
 
             if (!match(desiredJob, existingJob)) {
                 LOG.infof("Creating or updating job %s in %s", desiredJob.getMetadata().getName(), ns);
@@ -86,22 +84,23 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         final List<TransformationStep> steps = resource.getSpec().getTransformationSteps().getSteps();
 
         for (TransformationStep step : steps) {
-            final Deployment desiredDeployment = makeDesiredTransformationDeployment(resource, step.getName(), ns,
+            final Job desiredJob = makeDesiredTransformationJob(resource, step.getName(), ns,
                     "bs-config", step);
 
-            Deployment existingDeployment;
             try {
-                existingDeployment = context.getSecondaryResource(Deployment.class).orElse(null);
+                Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
+
+                if (!match(desiredJob, existingJob)) {
+                    LOG.infof("Creating or updating transformation job %s in %s", desiredJob.getMetadata().getName(), ns);
+
+                    kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                            .serverSideApply();
+                }
+
             } catch (Exception e) {
-                LOG.warnf("There is no existing deployment");
-                existingDeployment = null;
-            }
-
-            if (!match(desiredDeployment, existingDeployment)) {
-                LOG.infof("Creating or updating Deployment %s in %s", desiredDeployment.getMetadata().getName(), ns);
-
-                kubernetesClient.apps().deployments().inNamespace(ns).resource(desiredDeployment)
-                        .createOr(Replaceable::update);
+                LOG.warnf("Creating or updating transformation job named %s", desiredJob.getMetadata().getName());
+                kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                        .serverSideApply();
             }
         }
     }
@@ -236,23 +235,16 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                         "--wait"));
     }
 
-    private Deployment makeDesiredTransformationDeployment(
+    private Job makeDesiredTransformationJob(
             Acquisition acquisition, String deploymentName, String ns,
             String configMapName, TransformationStep transformationStep) {
-        Deployment desiredRunnerDeployment =
-                ReconcilerUtils.loadYaml(Deployment.class, getClass(), "runner-worker-deployment.yaml");
+        Job desiredRunnerJob =
+                ReconcilerUtils.loadYaml(Job.class, getClass(), "runner-worker-job.yaml");
 
-        desiredRunnerDeployment.getMetadata().setName(deploymentName);
-        desiredRunnerDeployment.getMetadata().setNamespace(ns);
+        desiredRunnerJob.getMetadata().setName(deploymentName);
+        desiredRunnerJob.getMetadata().setNamespace(ns);
 
-        final DeploymentSpec runnerSpec = desiredRunnerDeployment.getSpec();
-
-        runnerSpec.getSelector().getMatchLabels().put("app", deploymentName);
-        runnerSpec.getSelector().getMatchLabels().put("component", "runner-worker");
-        runnerSpec.getSelector().getMatchLabels().put("step", transformationStep.getConsumesFrom());
-        runnerSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
-        runnerSpec.getTemplate().getMetadata().getLabels().put("component", "runner-worker");
-        runnerSpec.getTemplate().getMetadata().getLabels().put("step", transformationStep.getConsumesFrom());
+        final JobSpec runnerSpec = desiredRunnerJob.getSpec();
 
         runnerSpec.getTemplate()
                 .getSpec()
@@ -260,15 +252,15 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                 .get(0)
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
-        desiredRunnerDeployment.addOwnerReference(acquisition);
+        desiredRunnerJob.addOwnerReference(acquisition);
 
         setupTransformationContainer(acquisition, runnerSpec, transformationStep);
 
-        return desiredRunnerDeployment;
+        return desiredRunnerJob;
     }
 
     private static void setupTransformationContainer(
-            Acquisition acquisition, DeploymentSpec spec, TransformationStep transformationStep) {
+            Acquisition acquisition, JobSpec spec, TransformationStep transformationStep) {
         final TransformationSteps transformationSteps = acquisition.getSpec().getTransformationSteps();
         if (transformationSteps == null) {
             LOG.warnf("Invalid transformation steps for acquisition  %s", acquisition);
