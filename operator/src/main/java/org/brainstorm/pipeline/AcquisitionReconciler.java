@@ -27,6 +27,8 @@ import org.brainstorm.api.pipeline.transformation.TransformationStep;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 import org.jboss.logging.Logger;
 
+import static org.brainstorm.operator.util.Matchers.match;
+
 public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private static final Logger LOG = Logger.getLogger(AcquisitionReconciler.class);
     public static final String BASE_DIR = "/opt/brainstorm";
@@ -326,39 +328,5 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         service.setEnv(List.of(dataDir, bootstrapHost));
     }
 
-    private boolean match(Job desiredJob, Job existingJob) {
-        if (existingJob == null) {
-            return false;
-        } else {
-            return desiredJob.getSpec().getTemplate().getMetadata().getName()
-                    .equals(existingJob.getSpec().getTemplate().getMetadata().getName()) &&
-                    desiredJob.getSpec().getTemplate().getSpec().getContainers().get(0).getImage()
-                            .equals(
-                                    existingJob.getSpec().getTemplate().getSpec().getContainers().get(0).getImage());
-        }
-    }
 
-    private boolean match(Deployment desiredDeployment, Deployment deployment) {
-        if (deployment == null) {
-            return false;
-        } else {
-            return desiredDeployment.getSpec().getReplicas().equals(deployment.getSpec().getReplicas()) &&
-                    desiredDeployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage()
-                            .equals(
-                                    deployment.getSpec().getTemplate().getSpec().getContainers().get(0).getImage());
-        }
-    }
-
-    public boolean match(Service desiredService, Service existingService) {
-        if (existingService == null) {
-            return false;
-        }
-
-        final ServiceSpec existingSpec = existingService.getSpec();
-        final ServiceSpec desiredSpec = desiredService.getSpec();
-
-        return existingSpec.getExternalName().equals(desiredSpec.getExternalName())
-                && existingSpec.getPorts().equals(desiredSpec.getPorts());
-
-    }
 }
