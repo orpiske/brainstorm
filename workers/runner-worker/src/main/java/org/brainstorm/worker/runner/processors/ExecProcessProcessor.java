@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.InvalidPayloadException;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -36,10 +37,28 @@ public class ExecProcessProcessor implements Processor {
     }
 
     @Override
-    public void process(Exchange exchange) throws Exception {
-        final String body = exchange.getIn().getBody(String.class);
-        LOG.info("Executing on data acquired handler: {}", body);
+    public void process(Exchange exchange) throws InvalidPayloadException {
+        final String body = exchange.getIn().getMandatoryBody(String.class);
+        LOG.info("Executing script {} on data acquired handler: {}", script, body);
+
+        File scriptFile = new File(script);
+        if (!scriptFile.exists()) {
+            LOG.error("The script {} does not exist", script);
+            return;
+        }
+
+        if (scriptFile.isDirectory()) {
+            LOG.error("The script {} is a directory and cannot be executed", script);
+            return;
+        }
+
+        if (!scriptFile.canExecute()) {
+            LOG.error("The script {} is not executable", script);
+            return;
+        }
+
         try {
+            LOG.info("Building process for execution");
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(script, body);
             processBuilder.inheritIO();
@@ -50,7 +69,6 @@ public class ExecProcessProcessor implements Processor {
                 LOG.warn("Transformation did not complete successfully");
             }
 
-            File scriptFile = new File(script);
             File stepOut = new File(scriptFile.getParentFile(), "step.out");
             if (stepOut.exists()) {
                 LOG.info("A step.out file exists, therefore using it to set the body");
@@ -64,5 +82,4 @@ public class ExecProcessProcessor implements Processor {
             throw new RuntimeException(e);
         }
     }
-
 }
