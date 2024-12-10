@@ -1,0 +1,23 @@
+apiVersion: "pipeline.brainstorm.org/v1alpha1"
+kind: Acquisition
+metadata:
+  name: my-test-acquisition
+  namespace: default
+spec:
+  pipelineInfra:
+    bootstrapServer: 'my-kafka-server'
+    port: 9092
+  acquisitionStep:
+    image: docker.io/my-org/camel-worker-runner-01:latest
+    producesTo: data.acquired
+  transformationSteps:
+    steps:
+      - image: docker.io/my-org/runner-worker-step-01
+        consumesFrom: data.acquired
+        producesTo: data.step.01
+        name: step-01
+# Just add more and more steps as needed
+#      - image: docker.io/my-org/runner-worker-step-02
+#        consumesFrom: data.step.01
+#        producesTo: data.completed
+#        name: step-02

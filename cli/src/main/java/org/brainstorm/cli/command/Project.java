@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.services;
+package org.brainstorm.cli.command;
 
-import java.io.InputStream;
+import picocli.CommandLine;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+@CommandLine.Command(name = "project",
+        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class})
+public class Project extends BaseCommand {
+    @Override
+    public void run() {
 
-@Path("/api/v1/acquisition/service")
-public interface AcquisitionService {
-
-
-    // TODO: remove
-    @POST
-    @Produces({MediaType.TEXT_PLAIN})
-    @Consumes({MediaType.APPLICATION_OCTET_STREAM})
-    @Path("/package")
-    public Response addPackage(InputStream stream);
+    }
 }

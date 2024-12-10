@@ -22,12 +22,13 @@ import jakarta.inject.Inject;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import io.quarkus.runtime.QuarkusApplication;
 import org.brainstorm.cli.command.Package;
+import org.brainstorm.cli.command.Project;
 import picocli.CommandLine;
 
 
 
 @TopCommand
-@CommandLine.Command(name = "brainstorm", subcommands = { Package.class})
+@CommandLine.Command(name = "brainstorm", subcommands = { Package.class, Project.class})
 public class CliMain implements Runnable, QuarkusApplication {
     @Inject
     CommandLine.IFactory factory;

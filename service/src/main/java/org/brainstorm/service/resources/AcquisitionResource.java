@@ -1,14 +1,5 @@
 package org.brainstorm.service.resources;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Base64;
 
 import jakarta.inject.Inject;
@@ -22,9 +13,7 @@ import jakarta.ws.rs.core.Response;
 
 import io.vertx.core.eventbus.EventBus;
 import org.brainstorm.service.util.BrainstormConfiguration;
-import  org.jboss.resteasy.reactive.multipart.FileUpload;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.reactive.RestForm;
 
 @Transactional
 @Path("/api/v1/acquisition/service")
@@ -55,29 +44,4 @@ public class AcquisitionResource {
             return Response.serverError().build();
         }
     }
-
-    @POST
-    @Produces({MediaType.TEXT_PLAIN})
-    @Consumes({MediaType.APPLICATION_OCTET_STREAM})
-    @Path("/package")
-//    public Response addPackage(@RestForm("package")InputStream body) {
-    public Response addPackage(InputStream body) {
-        LOG.infof("Adding package");
-
-        try {
-            final String cachePath = config.cache().path();
-            Paths.get(cachePath).toFile().mkdirs();
-
-            final java.nio.file.Path tempFile = Files.createTempFile(Paths.get(cachePath), "brainstorm", ".tmp");
-            try (FileOutputStream fos = new FileOutputStream(tempFile.toFile())) {
-                body.transferTo(fos);
-            }
-
-            eventBus.publish("package", tempFile);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return Response.serverError().build();
-        }
-    }
-
 }
