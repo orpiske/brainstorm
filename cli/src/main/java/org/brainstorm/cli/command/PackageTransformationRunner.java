@@ -48,6 +48,9 @@ public class PackageTransformationRunner extends PackageWorker {
     static class DockerfileBased {
         @CommandLine.Option(names = { "--base-dir" }, description = "The base dir containing the dockerfile and artifacts to build the container", arity = "0..1")
         private String baseDir;
+
+        @CommandLine.Option(names = { "--push" }, description = "Push the image to the registry", defaultValue = "false", arity = "0..1")
+        private boolean push;
     }
 
     @CommandLine.Option(names = {
@@ -88,7 +91,10 @@ public class PackageTransformationRunner extends PackageWorker {
 
 
     private void buildDockerfile() {
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .withRegistryUsername(username)
+                .withRegistryPassword(password)
+                .build();
 
         String dockerHost = System.getenv("DOCKER_HOST");
         if (dockerHost == null) {
@@ -122,9 +128,11 @@ public class PackageTransformationRunner extends PackageWorker {
                 .awaitImageId();
 
         try {
-            LOG.infof("Pushing image %s", outputImage);
-            dockerClient.pushImageCmd(outputImage)
-                    .exec(new ResultCallback.Adapter<>()).awaitCompletion();
+            if (dockerfileBased.push) {
+                LOG.infof("Pushing image %s", outputImage);
+                dockerClient.pushImageCmd(outputImage)
+                        .exec(new ResultCallback.Adapter<>()).awaitCompletion();
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
