@@ -14,6 +14,8 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.Replaceable;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
@@ -28,10 +30,10 @@ import org.jboss.logging.Logger;
 public class AcquisitionReconciler implements Reconciler<Acquisition> {
     private static final Logger LOG = Logger.getLogger(AcquisitionReconciler.class);
     public static final String BASE_DIR = "/opt/brainstorm";
-    public static final String CLASSPATH_DIR = BASE_DIR +"/classpath";
-    public static final String DATA_DIR = BASE_DIR +"/data";
-    public static final String ACQUISITION_DIR = BASE_DIR +"/acquisition";
-    public static final String STEP_DIR = BASE_DIR +"/step";
+    public static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
+    public static final String DATA_DIR = BASE_DIR + "/data";
+    public static final String ACQUISITION_DIR = BASE_DIR + "/acquisition";
+    public static final String STEP_DIR = BASE_DIR + "/step";
     public static final String DEFAULT_TRANSFORM_SCRIPT_NAME = "transform.sh";
 
     @Inject
@@ -60,22 +62,23 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
     }
 
     private void deployAcquisitionRunner(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
-        final Deployment desiredDeployment = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
+        final Job desiredJob = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
                 "bs-config");
 
-        Deployment existingDeployment;
+        Job existingJob;
         try {
-             existingDeployment = context.getSecondaryResource(Deployment.class).orElse(null);
-        } catch (Exception e) {
-            LOG.warnf("There is not existing deployment");
-            existingDeployment = null;
-        }
+            existingJob = context.getSecondaryResource(Job.class).orElse(null);
 
-        if (!match(desiredDeployment, existingDeployment)) {
-            LOG.infof("Creating or updating Deployment %s in %s", desiredDeployment.getMetadata().getName(), ns);
+            if (!match(desiredJob, existingJob)) {
+                LOG.infof("Creating or updating job %s in %s", desiredJob.getMetadata().getName(), ns);
 
-            kubernetesClient.apps().deployments().inNamespace(ns).resource(desiredDeployment)
-                    .createOr(Replaceable::update);
+                kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                        .serverSideApply();
+            }
+        } catch (IllegalArgumentException e) {
+            LOG.warnf("Creating or updating job named %s", desiredJob.getMetadata().getName());
+            kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                    .serverSideApply();
         }
     }
 
@@ -90,7 +93,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
             try {
                 existingDeployment = context.getSecondaryResource(Deployment.class).orElse(null);
             } catch (Exception e) {
-                LOG.warnf("There is not existing deployment");
+                LOG.warnf("There is no existing deployment");
                 existingDeployment = null;
             }
 
@@ -138,7 +141,8 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         }
     }
 
-    private Deployment makeDesiredServiceDeployment(Acquisition acquisition, String deploymentName, String ns,
+    private Deployment makeDesiredServiceDeployment(
+            Acquisition acquisition, String deploymentName, String ns,
             String configMapName) {
         Deployment desiredServiceDeployment =
                 ReconcilerUtils.loadYaml(Deployment.class, getClass(), "service-deployment.yaml");
@@ -179,35 +183,31 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         return service;
     }
 
-    private Deployment makeDesiredAcquisitionDeployment(Acquisition acquisition, String deploymentName, String ns,
+    private Job makeDesiredAcquisitionDeployment(
+            Acquisition acquisition, String deploymentName, String ns,
             String configMapName) {
-        Deployment desiredRunnerDeployment =
-                ReconcilerUtils.loadYaml(Deployment.class, getClass(), "acquisition-worker-deployment.yaml");
+        Job desiredJob =
+                ReconcilerUtils.loadYaml(Job.class, getClass(), "acquisition-worker-job.yaml");
 
-        desiredRunnerDeployment.getMetadata().setName(deploymentName);
-        desiredRunnerDeployment.getMetadata().setNamespace(ns);
+        desiredJob.getMetadata().setName(deploymentName);
+        desiredJob.getMetadata().setNamespace(ns);
 
-        final DeploymentSpec runnerSpec = desiredRunnerDeployment.getSpec();
+        final JobSpec jobSpec = desiredJob.getSpec();
 
-        runnerSpec.getSelector().getMatchLabels().put("app", deploymentName);
-        runnerSpec.getSelector().getMatchLabels().put("component", "acquisition-worker");
-        runnerSpec.getTemplate().getMetadata().getLabels().put("app", deploymentName);
-        runnerSpec.getTemplate().getMetadata().getLabels().put("component", "acquisition-worker");
-
-        runnerSpec.getTemplate()
+        jobSpec.getTemplate()
                 .getSpec()
                 .getVolumes()
                 .get(0)
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
-        desiredRunnerDeployment.addOwnerReference(acquisition);
+        desiredJob.addOwnerReference(acquisition);
 
-        setupAcquisitionContainer(acquisition, runnerSpec);
+        setupAcquisitionContainer(acquisition, jobSpec);
 
-        return desiredRunnerDeployment;
+        return desiredJob;
     }
 
-    private static void setupAcquisitionContainer(Acquisition acquisition, DeploymentSpec spec) {
+    private static void setupAcquisitionContainer(Acquisition acquisition, JobSpec spec) {
         final AcquisitionStep acquisitionStep = acquisition.getSpec().getAcquisitionStep();
         if (acquisitionStep == null) {
             LOG.warnf("Invalid acquisition %s", acquisition);
@@ -236,7 +236,8 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
                         "--wait"));
     }
 
-    private Deployment makeDesiredTransformationDeployment(Acquisition acquisition, String deploymentName, String ns,
+    private Deployment makeDesiredTransformationDeployment(
+            Acquisition acquisition, String deploymentName, String ns,
             String configMapName, TransformationStep transformationStep) {
         Deployment desiredRunnerDeployment =
                 ReconcilerUtils.loadYaml(Deployment.class, getClass(), "runner-worker-deployment.yaml");
@@ -266,7 +267,8 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         return desiredRunnerDeployment;
     }
 
-    private static void setupTransformationContainer(Acquisition acquisition, DeploymentSpec spec, TransformationStep transformationStep) {
+    private static void setupTransformationContainer(
+            Acquisition acquisition, DeploymentSpec spec, TransformationStep transformationStep) {
         final TransformationSteps transformationSteps = acquisition.getSpec().getTransformationSteps();
         if (transformationSteps == null) {
             LOG.warnf("Invalid transformation steps for acquisition  %s", acquisition);
@@ -323,13 +325,25 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         final Container service = containers
                 .stream().filter(c -> c.getName().equals("service")).findFirst().get();
 
-
         service.setCommand(List.of("/opt/jboss/container/java/run/run-java.sh"));
 
         EnvVar dataDir = new EnvVarBuilder().withName("DATA_DIR").withValue(DATA_DIR).build();
-        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST").withValue(acquisition.getSpec().getPipelineInfra().getBootstrapServer()).build();
+        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
+                .withValue(acquisition.getSpec().getPipelineInfra().getBootstrapServer()).build();
 
         service.setEnv(List.of(dataDir, bootstrapHost));
+    }
+
+    private boolean match(Job desiredJob, Job existingJob) {
+        if (existingJob == null) {
+            return false;
+        } else {
+            return desiredJob.getSpec().getTemplate().getMetadata().getName()
+                    .equals(existingJob.getSpec().getTemplate().getMetadata().getName()) &&
+                    desiredJob.getSpec().getTemplate().getSpec().getContainers().get(0).getImage()
+                            .equals(
+                                    existingJob.getSpec().getTemplate().getSpec().getContainers().get(0).getImage());
+        }
     }
 
     private boolean match(Deployment desiredDeployment, Deployment deployment) {
@@ -353,7 +367,6 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
 
         return existingSpec.getExternalName().equals(desiredSpec.getExternalName())
                 && existingSpec.getPorts().equals(desiredSpec.getPorts());
-
 
     }
 }
