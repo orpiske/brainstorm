@@ -214,6 +214,7 @@ NOTE: if you have never written an operator, check this [blog post on Red Hat De
 - (TBD) Resolve the Kafka cluster automatically (likely from Strimzi)
 - Resolve/set step topics automatically
 - (TBD) Integrate Kaoto 
+- Kubeflow integration
 - Implement other types of workers
   - Flink
   - Quarkus
