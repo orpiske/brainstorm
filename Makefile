@@ -1,7 +1,5 @@
-#REGISTRY:=quay.io
-#ORGANIZATION=bstorm
-REGISTRY:=docker.io
-ORGANIZATION=otavio021
+REGISTRY:=quay.io
+ORGANIZATION=bstorm
 VERSION_TAG:=latest
 KUBECTL:=kubectl
 
@@ -11,8 +9,11 @@ build:
 	podman build -f workers/runner-worker/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/runner-worker:$(VERSION_TAG) ./workers/runner-worker
 
 push:
+# These are only needed if not using quay.io
+ifneq ($(REGISTRY),quay.io)
 	podman tag localhost/$(ORGANIZATION)/operator:$(VERSION_TAG) $(REGISTRY)/$(ORGANIZATION)/operator:$(VERSION_TAG)
 	podman tag localhost/$(ORGANIZATION)/service:$(VERSION_TAG) $(REGISTRY)/$(ORGANIZATION)/service:$(VERSION_TAG)
+endif
 	podman push $(REGISTRY)/$(ORGANIZATION)/operator:$(VERSION_TAG)
 	podman push $(REGISTRY)/$(ORGANIZATION)/service:$(VERSION_TAG)
 	podman push $(REGISTRY)/$(ORGANIZATION)/camel-worker:$(VERSION_TAG)

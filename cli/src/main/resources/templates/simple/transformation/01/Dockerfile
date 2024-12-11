@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#FROM quay.io/bstorm/runner-worker:latest as base
-FROM docker.io/otavio021/runner-worker:latest as base
+FROM quay.io/bstorm/runner-worker:latest as base
 # LABEL maintainer="your@email-goes-here.com"
 WORKDIR /opt/brainstorm/step/
 COPY --chmod=755 convert-file.sh transform.sh ./
