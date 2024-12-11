@@ -34,10 +34,10 @@ is very likely possible to work with OpenShift and other Kubernetes distribution
 
 #### Kind 
 
-The recommended way to create a Kubernetes environment is via the Kind extension for Podman. 
-You can follow the steps described in the [Podman documentation](https://podman-desktop.io/docs/kind) to get it up and running.
+The recommended way to create a Kubernetes environment is via the Kind extension for Podman Desktop. 
+You can follow the steps described in the [Podman Desktop documentation](https://podman-desktop.io/docs/kind) to get it up and running.
 
-Make sure you have the `kubectl` and `kind` commands installed. Podman can help you install both of them.
+Make sure you have the `kubectl` and `kind` commands installed. Podman Desktop can help you install both of them.
 
 ### Running the operator
 
@@ -45,7 +45,7 @@ The operator uses the [Java Operator SDK](https://javaoperatorsdk.io/). This SDK
 Kubernetes cluster by inspecting the local configuration for the `kubectl` command. This process is 
 described in more detail in the [Getting Started section of the documentation](https://javaoperatorsdk.io/docs/getting-started/#getting-started).
 
-**NOTE**: Podman can manage the Kubernetes contexts for you. You can set it using the tray icon or the Dashboard.
+**NOTE**: Podman Desktop can manage the Kubernetes contexts for you. You can set it using the tray icon or the Dashboard.
 
 With the Kind cluster up and running, the `kubectl` command installed and the Kubernetes context set. Then you can launch the 
 operator. At this moment, the recommended way is by running the `main` method on BrainStormOperator class 
