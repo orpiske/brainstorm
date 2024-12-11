@@ -29,8 +29,8 @@ import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
-import org.brainstorm.pipeline.Acquisition;
-import org.brainstorm.pipeline.AcquisitionReconciler;
+import org.brainstorm.pipeline.Pipeline;
+import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
 
 import static org.brainstorm.operator.util.Constants.DATA_DIR;
@@ -45,7 +45,7 @@ public final class BackendServiceUtil {
 
     private BackendServiceUtil() {}
 
-    private static void setupBackendContainer(Acquisition acquisition, DeploymentSpec spec) {
+    private static void setupBackendContainer(Pipeline acquisition, DeploymentSpec spec) {
         final List<Container> containers = spec
                 .getTemplate()
                 .getSpec()
@@ -64,10 +64,10 @@ public final class BackendServiceUtil {
     }
 
     public static Deployment makeDesiredBackendServiceDeployment(
-            Acquisition acquisition, String deploymentName, String ns,
+            Pipeline acquisition, String deploymentName, String ns,
             String configMapName) {
         Deployment desiredServiceDeployment =
-                ReconcilerUtils.loadYaml(Deployment.class, AcquisitionReconciler.class, SERVICE_RESOURCE_FILE);
+                ReconcilerUtils.loadYaml(Deployment.class, PipelineReconciler.class, SERVICE_RESOURCE_FILE);
 
         desiredServiceDeployment.getMetadata().setName(deploymentName);
         desiredServiceDeployment.getMetadata().setNamespace(ns);
@@ -90,8 +90,8 @@ public final class BackendServiceUtil {
         return desiredServiceDeployment;
     }
 
-    public static Service makeServiceExternalService(Acquisition acquisition, String deploymentName, String ns) {
-        Service service = ReconcilerUtils.loadYaml(Service.class, AcquisitionReconciler.class, RESOURCE_FILE);
+    public static Service makeServiceExternalService(Pipeline acquisition, String deploymentName, String ns) {
+        Service service = ReconcilerUtils.loadYaml(Service.class, PipelineReconciler.class, RESOURCE_FILE);
 
         LOG.infof("Creating new external service for deployment: %s", deploymentName);
         service.getMetadata().setName("external-" + deploymentName);

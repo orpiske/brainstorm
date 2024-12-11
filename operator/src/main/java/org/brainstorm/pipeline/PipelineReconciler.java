@@ -21,8 +21,8 @@ import static org.brainstorm.operator.util.BackendServiceUtil.makeServiceExterna
 import static org.brainstorm.operator.util.Matchers.match;
 import static org.brainstorm.operator.util.TransformationUtil.makeDesiredTransformationJob;
 
-public class AcquisitionReconciler implements Reconciler<Acquisition> {
-    private static final Logger LOG = Logger.getLogger(AcquisitionReconciler.class);
+public class PipelineReconciler implements Reconciler<Pipeline> {
+    private static final Logger LOG = Logger.getLogger(PipelineReconciler.class);
 
 
     @Inject
@@ -35,9 +35,9 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
      * @return
      */
     @Override
-    public UpdateControl<Acquisition> reconcile(Acquisition resource, Context<Acquisition> context) {
+    public UpdateControl<Pipeline> reconcile(Pipeline resource, Context<Pipeline> context) {
         LOG.infof("Starting reconciliation for %s", resource.getMetadata().getName());
-        final AcquisitionSpec spec = resource.getSpec();
+        final PipelineSpec spec = resource.getSpec();
 
         if (spec == null) {
             LOG.warnf("No spec found for %s", resource.getMetadata().getName());
@@ -56,7 +56,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         return UpdateControl.noUpdate();
     }
 
-    private void deployAcquisitionRunner(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
+    private void deployAcquisitionRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final Job desiredJob = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
                 "bs-config");
         try {
@@ -75,7 +75,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         }
     }
 
-    private void deployTransformations(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
+    private void deployTransformations(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final List<TransformationStep> steps = resource.getSpec().getTransformationSteps().getSteps();
 
         for (TransformationStep step : steps) {
@@ -100,7 +100,7 @@ public class AcquisitionReconciler implements Reconciler<Acquisition> {
         }
     }
 
-    private void deployService(Acquisition resource, Context<Acquisition> context, String deploymentName, String ns) {
+    private void deployService(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final Deployment desiredDeployment = makeDesiredBackendServiceDeployment(resource, deploymentName, ns,
                 "bs-config");
 

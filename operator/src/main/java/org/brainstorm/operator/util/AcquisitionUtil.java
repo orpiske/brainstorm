@@ -27,8 +27,8 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
 import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
-import org.brainstorm.pipeline.Acquisition;
-import org.brainstorm.pipeline.AcquisitionReconciler;
+import org.brainstorm.pipeline.Pipeline;
+import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
 
 import static org.brainstorm.operator.util.Constants.classpathPath;
@@ -43,7 +43,7 @@ public final class AcquisitionUtil {
 
     private AcquisitionUtil() {}
 
-    private static void setupContainer(Acquisition acquisition, JobSpec spec) {
+    private static void setupContainer(Pipeline acquisition, JobSpec spec) {
         final AcquisitionStep acquisitionStep = acquisition.getSpec().getAcquisitionStep();
         if (acquisitionStep == null) {
             LOG.warnf("Invalid acquisition %s", acquisition);
@@ -73,10 +73,10 @@ public final class AcquisitionUtil {
     }
 
     public static Job makeDesiredAcquisitionDeployment(
-            Acquisition acquisition, String deploymentName, String ns,
+            Pipeline acquisition, String deploymentName, String ns,
             String configMapName) {
         Job desiredJob =
-                ReconcilerUtils.loadYaml(Job.class, AcquisitionReconciler.class, TEMPLATE_FILE);
+                ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);
 
         desiredJob.getMetadata().setName(deploymentName);
         desiredJob.getMetadata().setNamespace(ns);

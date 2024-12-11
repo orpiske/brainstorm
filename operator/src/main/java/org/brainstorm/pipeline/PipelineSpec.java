@@ -6,7 +6,7 @@ import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
 import org.brainstorm.api.pipeline.infra.PipelineInfra;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 
-public class AcquisitionSpec {
+public class PipelineSpec {
     private PipelineInfra pipelineInfra;
     private AcquisitionStep acquisitionStep;
     private TransformationSteps transformationSteps;
@@ -40,7 +40,7 @@ public class AcquisitionSpec {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AcquisitionSpec that = (AcquisitionSpec) o;
+        PipelineSpec that = (PipelineSpec) o;
         return Objects.equals(pipelineInfra, that.pipelineInfra) && Objects.equals(acquisitionStep,
                 that.acquisitionStep) && Objects.equals(transformationSteps, that.transformationSteps);
     }
@@ -52,7 +52,7 @@ public class AcquisitionSpec {
 
     @Override
     public String toString() {
-        return "AcquisitionSpec{" +
+        return "PipelineSpec{" +
                 "pipelineInfra=" + pipelineInfra +
                 ", acquisitionStep=" + acquisitionStep +
                 ", transformationSteps=" + transformationSteps +

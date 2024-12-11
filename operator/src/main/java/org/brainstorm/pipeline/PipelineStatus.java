@@ -1,4 +1,4 @@
 package org.brainstorm.pipeline;
 
-public class AcquisitionStatus {
+public class PipelineStatus {
 }

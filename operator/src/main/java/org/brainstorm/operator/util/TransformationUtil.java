@@ -26,8 +26,8 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
 import org.brainstorm.api.pipeline.transformation.TransformationStep;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
-import org.brainstorm.pipeline.Acquisition;
-import org.brainstorm.pipeline.AcquisitionReconciler;
+import org.brainstorm.pipeline.Pipeline;
+import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
 
 import static org.brainstorm.operator.util.Constants.getTransformationScript;
@@ -42,7 +42,7 @@ public final class TransformationUtil {
     private TransformationUtil() {}
 
     private static void setupContainer(
-            Acquisition acquisition, JobSpec spec, TransformationStep transformationStep) {
+            Pipeline acquisition, JobSpec spec, TransformationStep transformationStep) {
         final TransformationSteps transformationSteps = acquisition.getSpec().getTransformationSteps();
         if (transformationSteps == null) {
             LOG.warnf("Invalid transformation steps for acquisition  %s", acquisition);
@@ -71,10 +71,10 @@ public final class TransformationUtil {
     }
 
     public static Job makeDesiredTransformationJob(
-            Acquisition acquisition, String deploymentName, String ns,
+            Pipeline acquisition, String deploymentName, String ns,
             String configMapName, TransformationStep transformationStep) {
         Job desiredRunnerJob =
-                ReconcilerUtils.loadYaml(Job.class, AcquisitionReconciler.class, RESOURCE_FILE);
+                ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, RESOURCE_FILE);
 
         desiredRunnerJob.getMetadata().setName(deploymentName);
         desiredRunnerJob.getMetadata().setNamespace(ns);
