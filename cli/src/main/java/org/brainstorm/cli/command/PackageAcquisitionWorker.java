@@ -16,6 +16,8 @@ import com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath;
 import org.jboss.logging.Logger;
 import picocli.CommandLine;
 
+import static org.brainstorm.cli.command.Constants.CAMEL_SOURCE_LATEST;
+
 @CommandLine.Command(name = "acquisition",
         description = "Create a new brainstorm package for an acquisition worker", sortOptions = false)
 public class PackageAcquisitionWorker extends PackageWorker {
@@ -26,10 +28,10 @@ public class PackageAcquisitionWorker extends PackageWorker {
     private static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
 
 
-    @CommandLine.Option(names = {"--base-image"}, description = "The default base image", defaultValue = "quay.io/bstorm/camel-worker:latest", arity = "0..1")
+    @CommandLine.Option(names = {"--base-image"}, description = "The default base image", defaultValue = CAMEL_SOURCE_LATEST, arity = "0..1")
     protected String baseImage;
 
-    @CommandLine.Option(names = {"--output-image"}, description = "The default base image", defaultValue = "quay.io/bstorm/camel-worker-layered:latest", arity = "0..1")
+    @CommandLine.Option(names = {"--output-image"}, description = "The default base image", defaultValue = Constants.CAMEL_SOURCE_LAYERED_LATEST, arity = "0..1")
     protected String outputImage;
 
     @CommandLine.Option(names = {"--ingestion"}, description = "The ingestion file to use", arity = "0..1")

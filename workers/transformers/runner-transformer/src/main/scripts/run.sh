@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -14,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM quay.io/bstorm/runner-transformer:latest as base
-# LABEL maintainer="your@email-goes-here.com"
-WORKDIR /opt/brainstorm/step/
-COPY --chmod=755 convert-file.sh transform.sh ./
-#You can add more stuff to the container here
+install_path=$(dirname $0)
+jar_file=runner-transformer-jar-with-dependencies.jar
+
+java -jar ${install_path}/${jar_file} "$@"

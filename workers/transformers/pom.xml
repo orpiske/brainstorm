@@ -26,23 +26,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>common</artifactId>
-    <name>Brainstorm :: Workers :: Common</name>
+    <packaging>pom</packaging>
+    <artifactId>transformers</artifactId>
+    <name>Brainstorm :: Workers :: Transformers</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jackson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-kafka</artifactId>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>runner-transformer</module>
+    </modules>
 
 </project>

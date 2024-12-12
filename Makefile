@@ -5,8 +5,8 @@ KUBECTL:=kubectl
 
 build:
 	mvn clean -Dquarkus.container-image.build=true -Dquarkus.container-image.registry=$(REGISTRY) -Dquarkus.container-image.group=$(ORGANIZATION) -Dquarkus.container-image.tag=$(VERSION_TAG) package
-	podman build -f workers/camel-worker/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/camel-worker:$(VERSION_TAG) ./workers/camel-worker
-	podman build -f workers/runner-worker/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/runner-worker:$(VERSION_TAG) ./workers/runner-worker
+	podman build -f workers/sources/camel-source/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/camel-source:$(VERSION_TAG) ./workers/sources/camel-source
+	podman build -f workers/transformers/runner-transformer/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/runner-transformer:$(VERSION_TAG) ./workers/transformers/runner-transformer
 
 push:
 # These are only needed if not using quay.io
@@ -16,8 +16,8 @@ ifneq ($(REGISTRY),quay.io)
 endif
 	podman push $(REGISTRY)/$(ORGANIZATION)/operator:$(VERSION_TAG)
 	podman push $(REGISTRY)/$(ORGANIZATION)/service:$(VERSION_TAG)
-	podman push $(REGISTRY)/$(ORGANIZATION)/camel-worker:$(VERSION_TAG)
-	podman push $(REGISTRY)/$(ORGANIZATION)/runner-worker:$(VERSION_TAG)
+	podman push $(REGISTRY)/$(ORGANIZATION)/camel-source:$(VERSION_TAG)
+	podman push $(REGISTRY)/$(ORGANIZATION)/runner-transformer:$(VERSION_TAG)
 
 
 prepare-cluster:

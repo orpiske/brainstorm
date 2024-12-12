@@ -98,13 +98,13 @@ Once you have adjusted/developed the step, you can run the following commands to
 1. First, create the package for the acquisition:
 
 ```shell
-java -jar cli/target/quarkus-app/quarkus-run.jar package acquisition --ingestion /path/to/project/acquisition/route.yaml --output-image quay.io/myorg/camel-worker-runner-01:latest --username ${ORGANIZATION_USER} --password ${REGISTRY_PASSWD}
+java -jar cli/target/quarkus-app/quarkus-run.jar package acquisition --ingestion /path/to/project/acquisition/route.yaml --output-image quay.io/myorg/camel-source-runner-01:latest --username ${ORGANIZATION_USER} --password ${REGISTRY_PASSWD}
 ```
 
 2. Package any step(s) you might have: 
 
 ```shell
-java -jar cli/target/quarkus-app/quarkus-run.jar package runner --base-dir /path/to/project/transformation/01/ --output-image quay.io/myorg/runner-worker-step-01
+java -jar cli/target/quarkus-app/quarkus-run.jar package runner --base-dir /path/to/project/transformation/01/ --output-image quay.io/myorg/runner-transformation-step-01
 ```
 
 **NOTE**: repeat this for as many steps as you have, making sure to adjust the command and the name of the container.
@@ -112,7 +112,7 @@ java -jar cli/target/quarkus-app/quarkus-run.jar package runner --base-dir /path
 3. Push the transformation containers: 
 
 ```shell
-podman push quay.io/myorg/runner-worker-step-01
+podman push quay.io/myorg/runner-transformation-step-01
 ```
 
 **NOTE**: eventually, this will be handled by the CLI tool. 
@@ -130,11 +130,11 @@ spec:
     bootstrapServer: 'my-kafka-server'
     port: 9092
   acquisitionStep:
-    image: quay.io/my-org/camel-worker-runner-01:latest
+    image: quay.io/my-org/camel-source-runner-01:latest
     producesTo: data.acquired
   transformationSteps:
     steps:
-      - image: quay.io/my-org/runner-worker-step-01
+      - image: quay.io/my-org/runner-transformation-step-01
         consumesFrom: data.acquired
         producesTo: data.step.01
         name: step-01

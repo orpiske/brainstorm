@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM quay.io/bstorm/runner-transformer:latest as base
-# LABEL maintainer="your@email-goes-here.com"
-WORKDIR /opt/brainstorm/step/
-COPY --chmod=755 convert-file.sh transform.sh ./
-#You can add more stuff to the container here
+
+FROM eclipse-temurin:21-ubi9-minimal as base
+LABEL maintainer="orpiske@apache.org"
+RUN mkdir -p /opt/brainstorm/worker && \
+    mkdir -p /opt/brainstorm/data && \
+    mkdir -p /opt/brainstorm/classpath && \
+    mkdir -p /opt/brainstorm/acquisition
+VOLUME /opt/brainstorm/data
+WORKDIR /opt/brainstorm/worker/
+COPY --chmod=755 target/run.sh .
+COPY --chmod=744 target/camel-source-jar-with-dependencies.jar ./
+CMD /opt/brainstorm/worker/run.sh

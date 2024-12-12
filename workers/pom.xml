@@ -23,8 +23,8 @@
 
     <modules>
         <module>common</module>
-        <module>camel-worker</module>
-        <module>runner-worker</module>
+        <module>sources</module>
+        <module>transformers</module>
     </modules>
 
     <build>

@@ -13,7 +13,6 @@ import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.command.PushImageResultCallback;
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import com.google.cloud.tools.jib.api.CacheDirectoryCreationException;
 import com.google.cloud.tools.jib.api.Containerizer;
@@ -25,6 +24,8 @@ import com.google.cloud.tools.jib.api.buildplan.AbsoluteUnixPath;
 import org.jboss.logging.Logger;
 import picocli.CommandLine;
 
+import static org.brainstorm.cli.command.Constants.RUNNER_TRANSFORMER_LATEST;
+
 @CommandLine.Command(name = "runner",
         description = "Create a new brainstorm package for an transformation runner", sortOptions = false)
 public class PackageTransformationRunner extends PackageWorker {
@@ -34,8 +35,9 @@ public class PackageTransformationRunner extends PackageWorker {
     SimpleContainer simpleContainer;
 
     static class SimpleContainer {
+
         @CommandLine.Option(names = {
-                "--base-image" }, description = "The default base image", defaultValue = "quay.io/bstorm/runner-worker:latest", arity = "0..1")
+                "--base-image" }, description = "The default base image", defaultValue = RUNNER_TRANSFORMER_LATEST, arity = "0..1")
         protected String baseImage;
 
         @CommandLine.Option(names = { "--script" }, description = "The transformation script to use", arity = "0..1")

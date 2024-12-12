@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM quay.io/bstorm/runner-transformer:latest as base
-# LABEL maintainer="your@email-goes-here.com"
-WORKDIR /opt/brainstorm/step/
-COPY --chmod=755 convert-file.sh transform.sh ./
-#You can add more stuff to the container here
+
+FROM fedora:40 as base
+LABEL maintainer="orpiske@apache.org"
+RUN dnf install -y java-21-openjdk-headless && \
+    mkdir -p /opt/brainstorm/data && \
+    mkdir -p /opt/brainstorm/step && \
+    dnf clean all
+VOLUME /opt/brainstorm/data
+WORKDIR /opt/brainstorm/worker/
+COPY --chmod=755 target/run.sh .
+COPY --chmod=644 target/runner-transformer-jar-with-dependencies.jar ./
+CMD /opt/brainstorm/worker/run.sh
