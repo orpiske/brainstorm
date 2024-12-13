@@ -210,6 +210,22 @@ The system is currently composed of the following components:
 
 NOTE: if you have never written an operator, check this [blog post on Red Hat Developer's Blog](https://developers.redhat.com/articles/2022/02/15/write-kubernetes-java-java-operator-sdk).
 
+## Creating new Transformers
+
+You can use the transformer archetype to create new transformers.
+
+```shell
+ mvn -B archetype:generate -DarchetypeGroupId=org.brainstorm -DarchetypeArtifactId=archetype-worker-transformer -DarchetypeVersion=1.0-SNAPSHOT  -DgroupId=org.brainstorm -Dpackage=org.brainstorm.transformer.test -DartifactId=test-transformer -Dname=Test
+```
+
+**NOTE**: make sure to adapt the following parameters: 
+
+* `-Dpackage=org.brainstorm.transformer.test` -> the package should follow the convention `org.brainstorm.transformer.THE_NAME`
+* `-DartifactId=test-transformer` -> the artifact should follow the convention `THE-NAME-transformer`
+* `-Dname=Test` -> the name should be capitalized  
+
+This will ensure it matches the Brainstorm operator expectations. 
+
 # Roadmap / TODO
 
 - Manage the storage in the operator
