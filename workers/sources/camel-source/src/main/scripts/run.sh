@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 install_path=$(dirname $0)
-jar_file=camel-worker-jar-with-dependencies.jar
+jar_file=camel-source-jar-with-dependencies.jar
 
 WORKER_CP=${WORKER_CP:-/opt/brainstorm/classpath/}
 mainClass=org.brainstorm.source.camel.main.CamelSourceMain
