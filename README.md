@@ -233,7 +233,7 @@ This will ensure it matches the Brainstorm operator expectations.
 - Handle pushes via the CLI tool
 - (TBD) Resolve the Kafka cluster automatically (likely from Strimzi)
 - Resolve/set step topics automatically
-- (TBD) Integrate Kaoto 
+- (TBD) Integrate [Kaoto](https://kaoto.io/) 
 - Kubeflow integration
 - Implement other types of workers
   - Flink
