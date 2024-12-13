@@ -204,7 +204,8 @@ The system is currently composed of the following components:
   *  Source Workers
      * Camel Source: A worker that can consume from multiple sources using a Camel route defined in YAML.
   *  Transformation Workers:
-     * Runner Worker: a worker that runs a transformation task based provided in a script
+     * [Runner Worker](workers/transformers/runner-transformer): a worker that runs a transformation task based provided in a script
+     * [Camel Worker](workers/transformers/camel-transformer): a worker that consumes a YAML route from Camel and runs it.
 
 ## Developing the Operator
 
