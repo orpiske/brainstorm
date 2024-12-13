@@ -200,7 +200,11 @@ The system is currently composed of the following components:
 
 * An API module: that contains API, events, etc
 * A CLI module: to create new projects and package artifacts 
-
+* Workers that actually execute the actual acquisition, transformation and sink. Currently consists of:
+  *  Source Workers
+     * Camel Source: A worker that can consume from multiple sources using a Camel route defined in YAML.
+  *  Transformation Workers:
+     * Runner Worker: a worker that runs a transformation task based provided in a script
 
 ## Developing the Operator
 
