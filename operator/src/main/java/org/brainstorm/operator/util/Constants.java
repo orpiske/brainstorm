@@ -31,7 +31,7 @@ public class Constants {
     public static final String DATA_DIR = BASE_DIR + "/data";
     public static final String ACQUISITION_DIR = BASE_DIR + "/acquisition";
     public static final String STEP_DIR = BASE_DIR + "/step";
-    public static final String DEFAULT_TRANSFORM_SCRIPT_NAME = "transform.sh";
+
 
     public static String classpathPath() {
         return CLASSPATH_DIR;
@@ -41,12 +41,13 @@ public class Constants {
         return ACQUISITION_DIR + File.separator + "routes.yaml";
     }
 
-    public static String getTransformationScript(TransformationStep transformationStep) {
-        String script = transformationStep.getScript();
-        if (script == null || script.isEmpty()) {
-            script = DEFAULT_TRANSFORM_SCRIPT_NAME;
+    public static String getTransformationStep(TransformationStep transformationStep) {
+        String step = transformationStep.getStep();
+        if (step == null || step.isEmpty()) {
+            step = STEP_DIR;
         }
-        return stepPath(script);
+
+        return step;
     }
 
     public static String stepPath(String script) {

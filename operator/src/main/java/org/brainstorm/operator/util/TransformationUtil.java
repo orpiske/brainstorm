@@ -30,14 +30,15 @@ import org.brainstorm.pipeline.Pipeline;
 import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
 
-import static org.brainstorm.operator.util.Constants.getTransformationScript;
+import static org.brainstorm.operator.util.Constants.getTransformationStep;
 
 /**
  * Utilities for handling the transformation jobs
  */
 public final class TransformationUtil {
     private static final Logger LOG = Logger.getLogger(TransformationUtil.class);
-    private static final String RESOURCE_FILE = "runner-worker-job.yaml";
+    private static final String RESOURCE_FILE = "transformer-worker-job.yaml";
+    public static final String TRANSFORMER_WORKER_CONTAINER_NAME = "transformer-worker";
 
     private TransformationUtil() {}
 
@@ -54,18 +55,18 @@ public final class TransformationUtil {
                 .getSpec()
                 .getContainers();
 
-        final Container runner = containers.stream().filter(c -> c.getName().equals("runner-worker")).findFirst().get();
+        final Container runner = containers.stream().filter(c -> c.getName().equals(TRANSFORMER_WORKER_CONTAINER_NAME)).findFirst().get();
 
         final String image = transformationStep.getImage();
         LOG.infof("Building a new acquisition container using %s", image);
         runner.setImage(image);
 
-        final String script = getTransformationScript(transformationStep);
+        final String step = getTransformationStep(transformationStep);
 
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "--script", script,
+                        "--step", step,
                         "--consumes-from", transformationStep.getConsumesFrom(),
                         "--produces-to", transformationStep.getProducesTo()));
     }

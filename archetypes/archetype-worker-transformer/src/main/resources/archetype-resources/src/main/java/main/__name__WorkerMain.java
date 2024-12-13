@@ -38,6 +38,9 @@ public class ${name}WorkerMain implements Callable<Integer> {
     @CommandLine.Option(names = {"--produces-to"}, description = "The Kafka topic produce the completion event")
     private String producesTo;
 
+    @CommandLine.Option(names = {"--step"}, description = "The step to run on event", required = true)
+    private String step;
+
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
 

@@ -7,16 +7,16 @@ spec:
     metadata:
       labels:
         app: ""
-        component: "runner-worker"
+        component: "transformer-worker"
     spec:
       containers:
-        - name: runner-worker
+        - name: transformer-worker
           image: ""
           volumeMounts:
             - name: brainstorm-volume
               mountPath: /opt/brainstorm/data
       volumes:
-        - name: runner-config-volume
+        - name: transformer-config-volume
           configMap:
             name: ""
         - name: brainstorm-volume

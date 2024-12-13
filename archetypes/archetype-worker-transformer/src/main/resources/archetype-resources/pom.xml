@@ -40,6 +40,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>core-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
         </dependency>

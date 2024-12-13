@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.brainstorm.source.camel.common;
+package org.brainstorm.core.camel.common;
 
 public class GavUtil {
 

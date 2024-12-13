@@ -3,11 +3,12 @@ package org.brainstorm.api.event;
 import org.brainstorm.api.common.Header;
 
 @SuppressWarnings("unused")
-public class DataAcquired {
+public class DataTransformed {
     private Header header;
     private String name;
     private String address;
-    private String path;
+    private String inputPath;
+    private String outputPath;
 
     public Header getHeader() {
         return header;
@@ -33,21 +34,30 @@ public class DataAcquired {
         this.address = address;
     }
 
-    public String getPath() {
-        return path;
+    public String getInputPath() {
+        return inputPath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setInputPath(String inputPath) {
+        this.inputPath = inputPath;
+    }
+
+    public String getOutputPath() {
+        return outputPath;
+    }
+
+    public void setOutputPath(String outputPath) {
+        this.outputPath = outputPath;
     }
 
     @Override
     public String toString() {
-        return "DataAcquired{" +
+        return "DataTransformed{" +
                 "header=" + header +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
-                ", path='" + path + '\'' +
+                ", inputPath='" + inputPath + '\'' +
+                ", outputPath='" + outputPath + '\'' +
                 '}';
     }
 }

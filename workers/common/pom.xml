@@ -31,6 +31,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>core-camel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
         </dependency>

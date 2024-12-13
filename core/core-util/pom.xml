@@ -22,17 +22,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.brainstorm</groupId>
-        <artifactId>workers</artifactId>
+        <artifactId>core</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <packaging>pom</packaging>
-    <artifactId>transformers</artifactId>
-    <name>Brainstorm :: Workers :: Transformers</name>
+    <artifactId>core-util</artifactId>
+    <name>Brainstorm :: Core :: Util</name>
 
-    <modules>
-        <module>runner-transformer</module>
-        <module>camel-transformer</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
