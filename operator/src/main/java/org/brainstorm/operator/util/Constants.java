@@ -30,6 +30,7 @@ public class Constants {
     public static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
     public static final String DATA_DIR = BASE_DIR + "/data";
     public static final String ACQUISITION_DIR = BASE_DIR + "/acquisition";
+    public static final String SINK_DIR = BASE_DIR + "/sink";
     public static final String STEP_DIR = BASE_DIR + "/step";
 
 
@@ -37,8 +38,12 @@ public class Constants {
         return CLASSPATH_DIR;
     }
 
-    public static String routePath() {
+    public static String sourceRoutePath() {
         return ACQUISITION_DIR + File.separator + "routes.yaml";
+    }
+
+    public static String sinkRoutePath() {
+        return SINK_DIR;
     }
 
     public static String getTransformationStep(TransformationStep transformationStep) {

@@ -25,6 +25,7 @@
         <module>common</module>
         <module>sources</module>
         <module>transformers</module>
+        <module>sinks</module>
     </modules>
 
     <build>

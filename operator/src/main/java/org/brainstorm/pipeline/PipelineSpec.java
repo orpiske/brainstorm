@@ -4,12 +4,14 @@ import java.util.Objects;
 
 import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
 import org.brainstorm.api.pipeline.infra.PipelineInfra;
+import org.brainstorm.api.pipeline.sink.SinkStep;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 
 public class PipelineSpec {
     private PipelineInfra pipelineInfra;
     private AcquisitionStep acquisitionStep;
     private TransformationSteps transformationSteps;
+    private SinkStep sinkStep;
 
     public PipelineInfra getPipelineInfra() {
         return pipelineInfra;
@@ -35,6 +37,14 @@ public class PipelineSpec {
         this.transformationSteps = transformationSteps;
     }
 
+    public SinkStep getSinkStep() {
+        return sinkStep;
+    }
+
+    public void setSinkStep(SinkStep sinkStep) {
+        this.sinkStep = sinkStep;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -42,12 +52,13 @@ public class PipelineSpec {
         }
         PipelineSpec that = (PipelineSpec) o;
         return Objects.equals(pipelineInfra, that.pipelineInfra) && Objects.equals(acquisitionStep,
-                that.acquisitionStep) && Objects.equals(transformationSteps, that.transformationSteps);
+                that.acquisitionStep) && Objects.equals(transformationSteps,
+                that.transformationSteps) && Objects.equals(sinkStep, that.sinkStep);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pipelineInfra, acquisitionStep, transformationSteps);
+        return Objects.hash(pipelineInfra, acquisitionStep, transformationSteps, sinkStep);
     }
 
     @Override
@@ -56,6 +67,7 @@ public class PipelineSpec {
                 "pipelineInfra=" + pipelineInfra +
                 ", acquisitionStep=" + acquisitionStep +
                 ", transformationSteps=" + transformationSteps +
+                ", sinkStep=" + sinkStep +
                 '}';
     }
 }

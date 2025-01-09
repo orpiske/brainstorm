@@ -15,23 +15,33 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.api.pipeline.sink;
 
-import java.nio.file.Path;
+public class SinkStep {
+    private String image;
+    private String consumesFrom;
 
-import picocli.CommandLine;
-
-@CommandLine.Command(name = "package",
-        description = "Create a new brainstorm package", sortOptions = false, subcommands = {PackageAcquisitionWorker.class, PackageTransformationRunner.class, PackageSinkWorker.class})
-public class Package extends BaseCommand {
-
-
-    @Override
-    public void run() {
-
+    public String getImage() {
+        return image;
     }
 
-    private void upload(Path path) {
+    public void setImage(String image) {
+        this.image = image;
+    }
 
+    public String getConsumesFrom() {
+        return consumesFrom;
+    }
+
+    public void setConsumesFrom(String consumesFrom) {
+        this.consumesFrom = consumesFrom;
+    }
+
+    @Override
+    public String toString() {
+        return "SinkStep{" +
+                "image='" + image + '\'' +
+                ", producesTo='" + consumesFrom + '\'' +
+                '}';
     }
 }

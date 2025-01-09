@@ -7,10 +7,10 @@ spec:
     metadata:
       labels:
         app: ""
-        component: "transformer-worker"
+        component: "sink-worker"
     spec:
       containers:
-        - name: transformer-worker
+        - name: sink-runner
           image: ""
           volumeMounts:
             - name: brainstorm-volume

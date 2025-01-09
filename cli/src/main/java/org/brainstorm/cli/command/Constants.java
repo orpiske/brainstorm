@@ -21,4 +21,6 @@ public class Constants {
     public static final String CAMEL_SOURCE_LATEST = "quay.io/bstorm/camel-source:latest";
     public static final String CAMEL_SOURCE_LAYERED_LATEST = "quay.io/bstorm/camel-source-runner-01:latest";
     public static final String RUNNER_TRANSFORMER_LATEST = "quay.io/bstorm/runner-worker:latest";
+    public static final String CAMEL_SINK_LATEST = "quay.io/bstorm/camel-sink:latest";
+    public static final String CAMEL_SINK_LAYERED_LATEST = "quay.io/bstorm/camel-sink-runner-01:latest";
 }

@@ -15,23 +15,26 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.api.pipeline.sink;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
-import picocli.CommandLine;
+public class Sink {
+    private List<SinkStep> steps = new ArrayList<>();
 
-@CommandLine.Command(name = "package",
-        description = "Create a new brainstorm package", sortOptions = false, subcommands = {PackageAcquisitionWorker.class, PackageTransformationRunner.class, PackageSinkWorker.class})
-public class Package extends BaseCommand {
-
-
-    @Override
-    public void run() {
-
+    public List<SinkStep> getSteps() {
+        return steps;
     }
 
-    private void upload(Path path) {
+    public void setSteps(List<SinkStep> steps) {
+        this.steps = steps;
+    }
 
+    @Override
+    public String toString() {
+        return "Sink{" +
+                "steps=" + steps +
+                '}';
     }
 }

@@ -15,23 +15,26 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.sink.camel.routes;
 
-import java.nio.file.Path;
+import org.apache.camel.builder.RouteBuilder;
 
-import picocli.CommandLine;
+public class DataCompletedRoute extends RouteBuilder {
+    private final String bootstrapHost;
+    private final int bootstrapPort;
+    private final String consumesFrom;
+    private final String notifies;
 
-@CommandLine.Command(name = "package",
-        description = "Create a new brainstorm package", sortOptions = false, subcommands = {PackageAcquisitionWorker.class, PackageTransformationRunner.class, PackageSinkWorker.class})
-public class Package extends BaseCommand {
-
-
-    @Override
-    public void run() {
-
+    public DataCompletedRoute(String bootstrapHost, int bootstrapPort, String consumesFrom, String notifies) {
+        this.bootstrapHost = bootstrapHost;
+        this.bootstrapPort = bootstrapPort;
+        this.consumesFrom = consumesFrom;
+        this.notifies = notifies;
     }
 
-    private void upload(Path path) {
-
+    @Override
+    public void configure() {
+        fromF("kafka:%s?brokers=%s:%d", consumesFrom, bootstrapHost, bootstrapPort)
+                .toF("direct:%s", notifies);
     }
 }

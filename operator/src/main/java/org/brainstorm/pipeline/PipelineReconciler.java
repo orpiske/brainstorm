@@ -19,6 +19,7 @@ import static org.brainstorm.operator.util.AcquisitionUtil.makeDesiredAcquisitio
 import static org.brainstorm.operator.util.BackendServiceUtil.makeDesiredBackendServiceDeployment;
 import static org.brainstorm.operator.util.BackendServiceUtil.makeServiceExternalService;
 import static org.brainstorm.operator.util.Matchers.match;
+import static org.brainstorm.operator.util.SinkUtil.makeDesiredSinkDeployment;
 import static org.brainstorm.operator.util.TransformationUtil.makeDesiredTransformationJob;
 
 public class PipelineReconciler implements Reconciler<Pipeline> {
@@ -52,6 +53,7 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
         deployService(resource, context, "service", ns);
         deployAcquisitionRunner(resource, context, deploymentName, ns);
         deployTransformations(resource, context, deploymentName, ns);
+        deploySinkRunner(resource, context, deploymentName, ns);
 
         return UpdateControl.noUpdate();
     }
@@ -132,6 +134,25 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
 
             kubernetesClient.services().inNamespace(ns).resource(desiredExternalService)
                     .createOr(Replaceable::update);
+        }
+    }
+
+    private void deploySinkRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
+        final Job desiredJob = makeDesiredSinkDeployment(resource, deploymentName, ns,
+                "bs-config");
+        try {
+            Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
+
+            if (!match(desiredJob, existingJob)) {
+                LOG.infof("Creating or updating job %s in %s", desiredJob.getMetadata().getName(), ns);
+
+                kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                        .serverSideApply();
+            }
+        } catch (IllegalArgumentException e) {
+            LOG.warnf("Creating or updating job named %s", desiredJob.getMetadata().getName());
+            kubernetesClient.batch().v1().jobs().inNamespace(ns).resource(desiredJob)
+                    .serverSideApply();
         }
     }
 }
