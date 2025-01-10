@@ -13,6 +13,7 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.brainstorm.api.pipeline.transformation.TransformationStep;
+import org.brainstorm.operator.util.TopicGenerator;
 import org.jboss.logging.Logger;
 
 import static org.brainstorm.operator.util.Constants.CONFIG_MAP_NAME;
@@ -39,6 +40,8 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
     @Override
     public UpdateControl<Pipeline> reconcile(Pipeline resource, Context<Pipeline> context) {
         LOG.infof("Starting reconciliation for %s", resource.getMetadata().getName());
+        TopicGenerator.getInstance().reset();
+
         final PipelineSpec spec = resource.getSpec();
 
         if (spec == null) {

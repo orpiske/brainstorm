@@ -68,7 +68,7 @@ public final class SinkUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", sinkRoutePath(),
-                        "--consumes-from", sinkStep.getConsumesFrom(),
+                        "--consumes-from", TopicGenerator.getInstance().currentStepTopic(),
                         "--wait"));
     }
 

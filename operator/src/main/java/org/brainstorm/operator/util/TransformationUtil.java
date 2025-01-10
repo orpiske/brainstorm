@@ -67,8 +67,8 @@ public final class TransformationUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", step,
-                        "--consumes-from", transformationStep.getConsumesFrom(),
-                        "--produces-to", transformationStep.getProducesTo()));
+                        "--consumes-from", TopicGenerator.getInstance().currentStepTopic(),
+                        "--produces-to", TopicGenerator.getInstance().nextStepTopic()));
     }
 
     public static Job makeDesiredTransformationJob(

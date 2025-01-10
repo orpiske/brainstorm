@@ -68,7 +68,7 @@ public final class SourceUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--file", sourceRoutePath(),
-                        "--produces-to", sourceStep.getProducesTo(),
+                        "--produces-to", TopicGenerator.getInstance().currentStepTopic(),
                         "--wait"));
     }
 

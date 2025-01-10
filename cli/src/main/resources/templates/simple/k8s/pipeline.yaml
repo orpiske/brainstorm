@@ -9,15 +9,10 @@ spec:
     port: 9092
   sourceStep:
     image: docker.io/my-org/camel-source-runner-01:latest
-    producesTo: data.acquired
   transformationSteps:
     steps:
       - image: docker.io/my-org/runner-transformer-step-01
-        consumesFrom: data.acquired
-        producesTo: data.step.01
         name: step-01
 # Just add more and more steps as needed
 #      - image: docker.io/my-org/runner-worker-step-02
-#        consumesFrom: data.step.01
-#        producesTo: data.completed
 #        name: step-02
