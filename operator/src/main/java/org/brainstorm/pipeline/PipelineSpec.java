@@ -2,14 +2,14 @@ package org.brainstorm.pipeline;
 
 import java.util.Objects;
 
-import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
+import org.brainstorm.api.pipeline.source.SourceStep;
 import org.brainstorm.api.pipeline.infra.PipelineInfra;
 import org.brainstorm.api.pipeline.sink.SinkStep;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 
 public class PipelineSpec {
     private PipelineInfra pipelineInfra;
-    private AcquisitionStep acquisitionStep;
+    private SourceStep sourceStep;
     private TransformationSteps transformationSteps;
     private SinkStep sinkStep;
 
@@ -21,12 +21,12 @@ public class PipelineSpec {
         this.pipelineInfra = pipelineInfra;
     }
 
-    public AcquisitionStep getAcquisitionStep() {
-        return acquisitionStep;
+    public SourceStep getSourceStep() {
+        return sourceStep;
     }
 
-    public void setAcquisitionStep(AcquisitionStep acquisitionStep) {
-        this.acquisitionStep = acquisitionStep;
+    public void setSourceStep(SourceStep sourceStep) {
+        this.sourceStep = sourceStep;
     }
 
     public TransformationSteps getTransformationSteps() {
@@ -51,21 +51,21 @@ public class PipelineSpec {
             return false;
         }
         PipelineSpec that = (PipelineSpec) o;
-        return Objects.equals(pipelineInfra, that.pipelineInfra) && Objects.equals(acquisitionStep,
-                that.acquisitionStep) && Objects.equals(transformationSteps,
+        return Objects.equals(pipelineInfra, that.pipelineInfra) && Objects.equals(sourceStep,
+                that.sourceStep) && Objects.equals(transformationSteps,
                 that.transformationSteps) && Objects.equals(sinkStep, that.sinkStep);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pipelineInfra, acquisitionStep, transformationSteps, sinkStep);
+        return Objects.hash(pipelineInfra, sourceStep, transformationSteps, sinkStep);
     }
 
     @Override
     public String toString() {
         return "PipelineSpec{" +
                 "pipelineInfra=" + pipelineInfra +
-                ", acquisitionStep=" + acquisitionStep +
+                ", acquisitionStep=" + sourceStep +
                 ", transformationSteps=" + transformationSteps +
                 ", sinkStep=" + sinkStep +
                 '}';

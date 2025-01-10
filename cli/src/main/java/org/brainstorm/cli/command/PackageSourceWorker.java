@@ -18,13 +18,13 @@ import picocli.CommandLine;
 
 import static org.brainstorm.cli.command.Constants.CAMEL_SOURCE_LATEST;
 
-@CommandLine.Command(name = "acquisition",
-        description = "Create a new brainstorm package for an acquisition worker", sortOptions = false)
-public class PackageAcquisitionWorker extends PackageWorker {
-    private static final Logger LOG = Logger.getLogger(PackageAcquisitionWorker.class);
+@CommandLine.Command(name = "source",
+        description = "Create a new brainstorm package for a source worker", sortOptions = false)
+public class PackageSourceWorker extends PackageWorker {
+    private static final Logger LOG = Logger.getLogger(PackageSourceWorker.class);
 
     private static final String BASE_DIR = "/opt/brainstorm/";
-    private static final String ACQUISITION_DIR = BASE_DIR + "/acquisition";
+    private static final String SOURCE_DIR = BASE_DIR + "/source";
     private static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
 
 
@@ -46,7 +46,7 @@ public class PackageAcquisitionWorker extends PackageWorker {
         try {
             LOG.debugf("Building based on %s", baseImage);
             final JibContainerBuilder jibContainerBuilder = Jib.from(baseImage)
-                    .addLayer(List.of(Paths.get(ingestion)), AbsoluteUnixPath.get(ACQUISITION_DIR));
+                    .addLayer(List.of(Paths.get(ingestion)), AbsoluteUnixPath.get(SOURCE_DIR));
 
             if (artifacts != null && !artifacts.isEmpty()) {
                 jibContainerBuilder.addLayer(artifacts.stream().map(s -> Paths.get(s)).toList(),

@@ -15,7 +15,7 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.brainstorm.api.pipeline.transformation.TransformationStep;
 import org.jboss.logging.Logger;
 
-import static org.brainstorm.operator.util.AcquisitionUtil.makeDesiredAcquisitionDeployment;
+import static org.brainstorm.operator.util.SourceUtil.makeDesiredSourceDeployment;
 import static org.brainstorm.operator.util.BackendServiceUtil.makeDesiredBackendServiceDeployment;
 import static org.brainstorm.operator.util.BackendServiceUtil.makeServiceExternalService;
 import static org.brainstorm.operator.util.Matchers.match;
@@ -51,15 +51,15 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
         String deploymentName = resource.getMetadata().getName();
 
         deployService(resource, context, "service", ns);
-        deployAcquisitionRunner(resource, context, deploymentName, ns);
+        deploySourceRunner(resource, context, deploymentName, ns);
         deployTransformations(resource, context, deploymentName, ns);
         deploySinkRunner(resource, context, deploymentName, ns);
 
         return UpdateControl.noUpdate();
     }
 
-    private void deployAcquisitionRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
-        final Job desiredJob = makeDesiredAcquisitionDeployment(resource, deploymentName, ns,
+    private void deploySourceRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
+        final Job desiredJob = makeDesiredSourceDeployment(resource, deploymentName, ns,
                 "bs-config");
         try {
             Job existingJob = context.getSecondaryResource(Job.class).orElse(null);

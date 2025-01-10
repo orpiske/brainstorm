@@ -24,7 +24,7 @@ public class PackageSinkWorker extends PackageWorker {
     private static final Logger LOG = Logger.getLogger(PackageSinkWorker.class);
 
     private static final String BASE_DIR = "/opt/brainstorm/";
-    private static final String ACQUISITION_DIR = BASE_DIR + "/sink";
+    private static final String SINK_DIR = BASE_DIR + "/sink";
     private static final String CLASSPATH_DIR = BASE_DIR + "/classpath";
 
 
@@ -46,7 +46,7 @@ public class PackageSinkWorker extends PackageWorker {
         try {
             LOG.debugf("Building based on %s", baseImage);
             final JibContainerBuilder jibContainerBuilder = Jib.from(baseImage)
-                    .addLayer(List.of(Paths.get(ingestion)), AbsoluteUnixPath.get(ACQUISITION_DIR));
+                    .addLayer(List.of(Paths.get(ingestion)), AbsoluteUnixPath.get(SINK_DIR));
 
             if (artifacts != null && !artifacts.isEmpty()) {
                 jibContainerBuilder.addLayer(artifacts.stream().map(s -> Paths.get(s)).toList(),

@@ -7,7 +7,7 @@ spec:
   pipelineInfra:
     bootstrapServer: 'my-kafka-server'
     port: 9092
-  acquisitionStep:
+  sourceStep:
     image: docker.io/my-org/camel-source-runner-01:latest
     producesTo: data.acquired
   transformationSteps:

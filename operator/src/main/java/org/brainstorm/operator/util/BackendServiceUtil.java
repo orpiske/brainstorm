@@ -45,7 +45,7 @@ public final class BackendServiceUtil {
 
     private BackendServiceUtil() {}
 
-    private static void setupBackendContainer(Pipeline acquisition, DeploymentSpec spec) {
+    private static void setupBackendContainer(Pipeline pipeline, DeploymentSpec spec) {
         final List<Container> containers = spec
                 .getTemplate()
                 .getSpec()
@@ -58,13 +58,13 @@ public final class BackendServiceUtil {
 
         EnvVar dataDir = new EnvVarBuilder().withName("DATA_DIR").withValue(DATA_DIR).build();
         EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
-                .withValue(acquisition.getSpec().getPipelineInfra().getBootstrapServer()).build();
+                .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
 
         service.setEnv(List.of(dataDir, bootstrapHost));
     }
 
     public static Deployment makeDesiredBackendServiceDeployment(
-            Pipeline acquisition, String deploymentName, String ns,
+            Pipeline pipeline, String deploymentName, String ns,
             String configMapName) {
         Deployment desiredServiceDeployment =
                 ReconcilerUtils.loadYaml(Deployment.class, PipelineReconciler.class, SERVICE_RESOURCE_FILE);
@@ -84,13 +84,13 @@ public final class BackendServiceUtil {
                 .get(0)
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
-        desiredServiceDeployment.addOwnerReference(acquisition);
-        setupBackendContainer(acquisition, serviceSpec);
+        desiredServiceDeployment.addOwnerReference(pipeline);
+        setupBackendContainer(pipeline, serviceSpec);
 
         return desiredServiceDeployment;
     }
 
-    public static Service makeServiceExternalService(Pipeline acquisition, String deploymentName, String ns) {
+    public static Service makeServiceExternalService(Pipeline pipeline, String deploymentName, String ns) {
         Service service = ReconcilerUtils.loadYaml(Service.class, PipelineReconciler.class, RESOURCE_FILE);
 
         LOG.infof("Creating new external service for deployment: %s", deploymentName);
@@ -100,7 +100,7 @@ public final class BackendServiceUtil {
         ServiceSpec serviceSpec = service.getSpec();
         serviceSpec.setSelector(Map.of("app", deploymentName, "component", "service"));
 
-        service.addOwnerReference(acquisition);
+        service.addOwnerReference(pipeline);
 
         return service;
     }

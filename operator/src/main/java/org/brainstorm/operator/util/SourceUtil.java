@@ -26,7 +26,7 @@ import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
-import org.brainstorm.api.pipeline.acquisition.AcquisitionStep;
+import org.brainstorm.api.pipeline.source.SourceStep;
 import org.brainstorm.pipeline.Pipeline;
 import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
@@ -35,18 +35,18 @@ import static org.brainstorm.operator.util.Constants.classpathPath;
 import static org.brainstorm.operator.util.Constants.sourceRoutePath;
 
 /**
- * Utilities for handling the acquisition jobs
+ * Utilities for handling the source jobs
  */
-public final class AcquisitionUtil {
-    private static final Logger LOG = Logger.getLogger(AcquisitionUtil.class);
-    private static final String TEMPLATE_FILE = "acquisition-worker-job.yaml";
+public final class SourceUtil {
+    private static final Logger LOG = Logger.getLogger(SourceUtil.class);
+    private static final String TEMPLATE_FILE = "source-worker-job.yaml";
 
-    private AcquisitionUtil() {}
+    private SourceUtil() {}
 
-    private static void setupContainer(Pipeline acquisition, JobSpec spec) {
-        final AcquisitionStep acquisitionStep = acquisition.getSpec().getAcquisitionStep();
-        if (acquisitionStep == null) {
-            LOG.warnf("Invalid acquisition %s", acquisition);
+    private static void setupContainer(Pipeline pipeline, JobSpec spec) {
+        final SourceStep sourceStep = pipeline.getSpec().getSourceStep();
+        if (sourceStep == null) {
+            LOG.warnf("Invalid pipeline %s", pipeline);
             return;
         }
 
@@ -55,10 +55,10 @@ public final class AcquisitionUtil {
                 .getSpec()
                 .getContainers();
 
-        final Container runner = containers.stream().filter(c -> c.getName().equals("camel-runner")).findFirst().get();
+        final Container runner = containers.stream().filter(c -> c.getName().equals("source-runner")).findFirst().get();
 
-        final String image = acquisition.getSpec().getAcquisitionStep().getImage();
-        LOG.infof("Building a new acquisition container using %s", image);
+        final String image = pipeline.getSpec().getSourceStep().getImage();
+        LOG.infof("Building a new pipeline container using %s", image);
         runner.setImage(image);
 
         EnvVar dataDir = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
@@ -66,14 +66,14 @@ public final class AcquisitionUtil {
 
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
-                        "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
+                        "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--file", sourceRoutePath(),
-                        "--produces-to", acquisitionStep.getProducesTo(),
+                        "--produces-to", sourceStep.getProducesTo(),
                         "--wait"));
     }
 
-    public static Job makeDesiredAcquisitionDeployment(
-            Pipeline acquisition, String deploymentName, String ns,
+    public static Job makeDesiredSourceDeployment(
+            Pipeline pipeline, String deploymentName, String ns,
             String configMapName) {
         Job desiredJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);
@@ -89,9 +89,9 @@ public final class AcquisitionUtil {
                 .get(0)
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
-        desiredJob.addOwnerReference(acquisition);
+        desiredJob.addOwnerReference(pipeline);
 
-        setupContainer(acquisition, jobSpec);
+        setupContainer(pipeline, jobSpec);
 
         return desiredJob;
     }

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.acquisition;
+package org.brainstorm.api.pipeline.source;
 
-public class AcquisitionStep {
+public class SourceStep {
     private String image;
     private String producesTo;
 
@@ -39,7 +39,7 @@ public class AcquisitionStep {
 
     @Override
     public String toString() {
-        return "AcquisitionStep{" +
+        return "SourceStep{" +
                 "image='" + image + '\'' +
                 ", producesTo='" + producesTo + '\'' +
                 '}';

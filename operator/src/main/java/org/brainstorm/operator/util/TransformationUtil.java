@@ -43,10 +43,10 @@ public final class TransformationUtil {
     private TransformationUtil() {}
 
     private static void setupContainer(
-            Pipeline acquisition, JobSpec spec, TransformationStep transformationStep) {
-        final TransformationSteps transformationSteps = acquisition.getSpec().getTransformationSteps();
+            Pipeline pipeline, JobSpec spec, TransformationStep transformationStep) {
+        final TransformationSteps transformationSteps = pipeline.getSpec().getTransformationSteps();
         if (transformationSteps == null) {
-            LOG.warnf("Invalid transformation steps for acquisition  %s", acquisition);
+            LOG.warnf("Invalid transformation steps for pipeline  %s", pipeline);
             return;
         }
 
@@ -58,21 +58,21 @@ public final class TransformationUtil {
         final Container runner = containers.stream().filter(c -> c.getName().equals(TRANSFORMER_WORKER_CONTAINER_NAME)).findFirst().get();
 
         final String image = transformationStep.getImage();
-        LOG.infof("Building a new acquisition container using %s", image);
+        LOG.infof("Building a new pipeline container using %s", image);
         runner.setImage(image);
 
         final String step = getTransformationStep(transformationStep);
 
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
-                        "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
+                        "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", step,
                         "--consumes-from", transformationStep.getConsumesFrom(),
                         "--produces-to", transformationStep.getProducesTo()));
     }
 
     public static Job makeDesiredTransformationJob(
-            Pipeline acquisition, String deploymentName, String ns,
+            Pipeline pipeline, String deploymentName, String ns,
             String configMapName, TransformationStep transformationStep) {
         Job desiredRunnerJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, RESOURCE_FILE);
@@ -88,9 +88,9 @@ public final class TransformationUtil {
                 .get(0)
                 .setConfigMap(new ConfigMapVolumeSourceBuilder().withName(configMapName).build());
 
-        desiredRunnerJob.addOwnerReference(acquisition);
+        desiredRunnerJob.addOwnerReference(pipeline);
 
-        setupContainer(acquisition, runnerSpec, transformationStep);
+        setupContainer(pipeline, runnerSpec, transformationStep);
 
         return desiredRunnerJob;
     }

@@ -20,7 +20,7 @@ LABEL maintainer="orpiske@apache.org"
 RUN mkdir -p /opt/brainstorm/worker && \
     mkdir -p /opt/brainstorm/data && \
     mkdir -p /opt/brainstorm/classpath && \
-    mkdir -p /opt/brainstorm/acquisition
+    mkdir -p /opt/brainstorm/source
 VOLUME /opt/brainstorm/data
 WORKDIR /opt/brainstorm/worker/
 COPY --chmod=755 target/run.sh .

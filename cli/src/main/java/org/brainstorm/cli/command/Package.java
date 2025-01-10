@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "package",
-        description = "Create a new brainstorm package", sortOptions = false, subcommands = {PackageAcquisitionWorker.class, PackageTransformationRunner.class, PackageSinkWorker.class})
+        description = "Create a new brainstorm package", sortOptions = false, subcommands = { PackageSourceWorker.class, PackageTransformationRunner.class, PackageSinkWorker.class})
 public class Package extends BaseCommand {
 
 

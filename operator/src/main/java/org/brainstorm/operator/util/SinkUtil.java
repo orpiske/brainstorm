@@ -35,7 +35,7 @@ import static org.brainstorm.operator.util.Constants.classpathPath;
 import static org.brainstorm.operator.util.Constants.sinkRoutePath;
 
 /**
- * Utilities for handling the acquisition jobs
+ * Utilities for handling the sink jobs
  */
 public final class SinkUtil {
     private static final Logger LOG = Logger.getLogger(SinkUtil.class);
@@ -43,10 +43,10 @@ public final class SinkUtil {
 
     private SinkUtil() {}
 
-    private static void setupContainer(Pipeline acquisition, JobSpec spec) {
-        final SinkStep sinkStep = acquisition.getSpec().getSinkStep();
+    private static void setupContainer(Pipeline pipeline, JobSpec spec) {
+        final SinkStep sinkStep = pipeline.getSpec().getSinkStep();
         if (sinkStep == null) {
-            LOG.warnf("Invalid sinkStep %s", acquisition);
+            LOG.warnf("Invalid sinkStep %s", pipeline);
             return;
         }
 
@@ -57,7 +57,7 @@ public final class SinkUtil {
 
         final Container runner = containers.stream().filter(c -> c.getName().equals("sink-runner")).findFirst().get();
 
-        final String image = acquisition.getSpec().getSinkStep().getImage();
+        final String image = pipeline.getSpec().getSinkStep().getImage();
         LOG.infof("Building a new sink container using %s", image);
         runner.setImage(image);
 
@@ -66,7 +66,7 @@ public final class SinkUtil {
 
         runner
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
-                        "-s", acquisition.getSpec().getPipelineInfra().getBootstrapServer(),
+                        "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", sinkRoutePath(),
                         "--consumes-from", sinkStep.getConsumesFrom(),
                         "--wait"));

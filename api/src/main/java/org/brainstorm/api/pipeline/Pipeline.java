@@ -17,19 +17,19 @@
 
 package org.brainstorm.api.pipeline;
 
-import org.brainstorm.api.pipeline.acquisition.Acquisition;
+import org.brainstorm.api.pipeline.source.Source;
 import org.brainstorm.api.pipeline.transformation.TransformationSteps;
 
 public class Pipeline {
-    private Acquisition acquisition;
+    private Source source;
     private TransformationSteps transformation;
 
-    public Acquisition getAcquisition() {
-        return acquisition;
+    public Source getSource() {
+        return source;
     }
 
-    public void setAcquisition(Acquisition acquisition) {
-        this.acquisition = acquisition;
+    public void setSource(Source source) {
+        this.source = source;
     }
 
     public TransformationSteps getTransformation() {
@@ -43,7 +43,7 @@ public class Pipeline {
     @Override
     public String toString() {
         return "Pipeline{" +
-                "acquisition=" + acquisition +
+                "acquisition=" + source +
                 ", transformation=" + transformation +
                 '}';
     }

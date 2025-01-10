@@ -84,8 +84,8 @@ java -jar cli/target/quarkus-app/quarkus-run.jar project new --destination /path
 
 This will create a new project with the following structure:
 
-* `/path/to/project/acquisition` -> this is where acquisition artifacts go
-  * `/path/to/project/acquisition/route.yaml` -> this is the YAML route for Camel. Design it with [Kaoto](https://kaoto.io/).
+* `/path/to/project/source` -> this is where source artifacts (for data acquisition) go
+  * `/path/to/project/source/route.yaml` -> this is the YAML route for Camel. Design it with [Kaoto](https://kaoto.io/).
 * `/path/to/project/k8s` -> this is where the kubernetes artifacts go
   * `/path/to/project/k8s/pipeline.yaml` -> this is the pipeline that is deployed
 * `/path/to/project/transformation` -> this is where transformation artifacts go.
@@ -95,10 +95,10 @@ This will create a new project with the following structure:
 
 Once you have adjusted/developed the step, you can run the following commands to create the images:
 
-1. First, create the package for the acquisition:
+1. First, create the package for the source:
 
 ```shell
-java -jar cli/target/quarkus-app/quarkus-run.jar package acquisition --ingestion /path/to/project/acquisition/route.yaml --output-image quay.io/myorg/camel-source-runner-01:latest --username ${ORGANIZATION_USER} --password ${REGISTRY_PASSWD}
+java -jar cli/target/quarkus-app/quarkus-run.jar package source --ingestion /path/to/project/source/route.yaml --output-image quay.io/myorg/camel-source-runner-01:latest --username ${ORGANIZATION_USER} --password ${REGISTRY_PASSWD}
 ```
 
 2. Package any step(s) you might have: 
@@ -129,7 +129,7 @@ spec:
   pipelineInfra:
     bootstrapServer: 'my-kafka-server'
     port: 9092
-  acquisitionStep:
+  sourceStep:
     image: quay.io/my-org/camel-source-runner-01:latest
     producesTo: data.acquired
   transformationSteps:
@@ -159,14 +159,14 @@ NAME                       AGE
 camel-dataset-brainstorm   6m26s
 ```
 
-You can check if the acquisition and transformation jobs were created using the `kubectl get jobs` command. 
+You can check if the source and transformation jobs were created using the `kubectl get jobs` command. 
 
 After completion, you can verify their statuses using: 
 
 ```shell
 [~]$ kubectl get jobs
 NAME                       STATUS     COMPLETIONS   DURATION   AGE
-my-sample-acquisition      Complete   1/1           47s        7m27s
+my-sample-source      Complete   1/1           47s        7m27s
 step-01                    Complete   1/1           111s       7m27s
 step-02                    Complete   1/1           113s       7m27s
 ```
@@ -200,8 +200,10 @@ The system is currently composed of the following components:
 
 * An API module: that contains API, events, etc
 * A CLI module: to create new projects and package artifacts 
-* Workers that actually execute the actual acquisition, transformation and sink. Currently consists of:
-  *  Source Workers
+* Workers that actually execute the actual data sourcing, transformation and sinking. Currently consists of:
+  * Sink Workers
+    * Camel Sink: A worker that uses a YAML route to sink the data to one of the components supported by Camel.
+  * Source Workers
      * Camel Source: A worker that can consume from multiple sources using a Camel route defined in YAML.
   *  Transformation Workers:
      * [Runner Worker](workers/transformers/runner-transformer): a worker that runs a transformation task based provided in a script

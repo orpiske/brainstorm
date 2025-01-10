@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.acquisition;
+package org.brainstorm.api.pipeline.source;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Acquisition {
-    private List<AcquisitionStep> steps = new ArrayList<>();
+public class Source {
+    private List<SourceStep> steps = new ArrayList<>();
 
-    public List<AcquisitionStep> getSteps() {
+    public List<SourceStep> getSteps() {
         return steps;
     }
 
-    public void setSteps(List<AcquisitionStep> steps) {
+    public void setSteps(List<SourceStep> steps) {
         this.steps = steps;
     }
 
     @Override
     public String toString() {
-        return "Acquisition{" +
+        return "Source{" +
                 "steps=" + steps +
                 '}';
     }
