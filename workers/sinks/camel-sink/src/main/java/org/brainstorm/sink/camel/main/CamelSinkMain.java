@@ -74,6 +74,9 @@ public class CamelSinkMain implements Callable<Integer> {
         }
 
         CamelContext context = new DefaultCamelContext();
+        context.getRegistry().bind("global.bootstrapServer", bootstrapServer);
+        context.getRegistry().bind("global.bootstrapServerPort", bootstrapPort);
+
         BrainstormRoutesLoader routesLoader = new BrainstormRoutesLoader(dependenciesList);
 
         String routeFileUrl = String.format("file://%s", routeFile);
