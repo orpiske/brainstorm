@@ -16,3 +16,5 @@ spec:
 # Just add more and more steps as needed
 #      - image: docker.io/my-org/runner-worker-step-02
 #        name: step-02
+  sinkStep:
+    image: docker.io/my-org/camel-sink-runner-01:latest
