@@ -15,6 +15,7 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.brainstorm.api.pipeline.transformation.TransformationStep;
 import org.jboss.logging.Logger;
 
+import static org.brainstorm.operator.util.Constants.CONFIG_MAP_NAME;
 import static org.brainstorm.operator.util.SourceUtil.makeDesiredSourceDeployment;
 import static org.brainstorm.operator.util.BackendServiceUtil.makeDesiredBackendServiceDeployment;
 import static org.brainstorm.operator.util.BackendServiceUtil.makeServiceExternalService;
@@ -60,7 +61,7 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
 
     private void deploySourceRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final Job desiredJob = makeDesiredSourceDeployment(resource, deploymentName, ns,
-                "bs-config");
+                CONFIG_MAP_NAME);
         try {
             Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
 
@@ -82,7 +83,7 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
 
         for (TransformationStep step : steps) {
             final Job desiredJob = makeDesiredTransformationJob(resource, step.getName(), ns,
-                    "bs-config", step);
+                    CONFIG_MAP_NAME, step);
 
             try {
                 Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
@@ -104,7 +105,7 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
 
     private void deployService(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final Deployment desiredDeployment = makeDesiredBackendServiceDeployment(resource, deploymentName, ns,
-                "bs-config");
+                CONFIG_MAP_NAME);
 
         Deployment existingDeployment;
         try {
@@ -139,7 +140,7 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
 
     private void deploySinkRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
         final Job desiredJob = makeDesiredSinkDeployment(resource, deploymentName, ns,
-                "bs-config");
+                CONFIG_MAP_NAME);
         try {
             Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
 

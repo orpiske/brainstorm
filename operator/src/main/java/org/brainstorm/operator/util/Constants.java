@@ -32,6 +32,7 @@ public class Constants {
     public static final String SOURCE_DIR = BASE_DIR + "/source";
     public static final String SINK_DIR = BASE_DIR + "/sink";
     public static final String STEP_DIR = BASE_DIR + "/step";
+    public static final String CONFIG_MAP_NAME = "bs-config";
 
 
     public static String classpathPath() {
