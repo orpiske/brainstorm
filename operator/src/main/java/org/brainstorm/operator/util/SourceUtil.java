@@ -78,7 +78,7 @@ public final class SourceUtil {
         Job desiredJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);
 
-        desiredJob.getMetadata().setName(deploymentName);
+        desiredJob.getMetadata().setName("source-job");
         desiredJob.getMetadata().setNamespace(ns);
 
         final JobSpec jobSpec = desiredJob.getSpec();
