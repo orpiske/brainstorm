@@ -68,13 +68,11 @@ public final class SourceUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--file", sourceRoutePath(),
-                        "--produces-to", TopicGenerator.getInstance().currentStepTopic(),
+                        "--produces-to", TopicNameGenerator.getInstance().current(),
                         "--wait"));
     }
 
-    public static Job makeDesiredSourceDeployment(
-            Pipeline pipeline, String deploymentName, String ns,
-            String configMapName) {
+    public static Job makeDesiredSourceDeployment(Pipeline pipeline, String ns, String configMapName) {
         Job desiredJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);
 

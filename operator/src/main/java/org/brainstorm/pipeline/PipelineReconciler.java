@@ -13,7 +13,8 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.brainstorm.api.pipeline.transformation.TransformationStep;
-import org.brainstorm.operator.util.TopicGenerator;
+import org.brainstorm.operator.util.StepNameGenerator;
+import org.brainstorm.operator.util.TopicNameGenerator;
 import org.jboss.logging.Logger;
 
 import static org.brainstorm.operator.util.Constants.CONFIG_MAP_NAME;
@@ -40,7 +41,8 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
     @Override
     public UpdateControl<Pipeline> reconcile(Pipeline resource, Context<Pipeline> context) {
         LOG.infof("Starting reconciliation for %s", resource.getMetadata().getName());
-        TopicGenerator.getInstance().reset();
+        TopicNameGenerator.getInstance().reset();
+        StepNameGenerator.getInstance().reset();
 
         final PipelineSpec spec = resource.getSpec();
 
@@ -55,15 +57,15 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
         String deploymentName = resource.getMetadata().getName();
 
         deployService(resource, context, "service", ns);
-        deploySourceRunner(resource, context, deploymentName, ns);
+        deploySourceRunner(resource, context, ns);
         deployTransformations(resource, context, deploymentName, ns);
-        deploySinkRunner(resource, context, deploymentName, ns);
+        deploySinkRunner(resource, context, ns);
 
         return UpdateControl.noUpdate();
     }
 
-    private void deploySourceRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
-        final Job desiredJob = makeDesiredSourceDeployment(resource, deploymentName, ns,
+    private void deploySourceRunner(Pipeline resource, Context<Pipeline> context, String ns) {
+        final Job desiredJob = makeDesiredSourceDeployment(resource, ns,
                 CONFIG_MAP_NAME);
         try {
             Job existingJob = context.getSecondaryResource(Job.class).orElse(null);
@@ -85,7 +87,8 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
         final List<TransformationStep> steps = resource.getSpec().getTransformationSteps().getSteps();
 
         for (TransformationStep step : steps) {
-            final Job desiredJob = makeDesiredTransformationJob(resource, step.getName(), ns,
+            final String stepName = StepNameGenerator.getInstance().next();
+            final Job desiredJob = makeDesiredTransformationJob(resource, stepName, ns,
                     CONFIG_MAP_NAME, step);
 
             try {
@@ -141,8 +144,8 @@ public class PipelineReconciler implements Reconciler<Pipeline> {
         }
     }
 
-    private void deploySinkRunner(Pipeline resource, Context<Pipeline> context, String deploymentName, String ns) {
-        final Job desiredJob = makeDesiredSinkDeployment(resource, deploymentName, ns,
+    private void deploySinkRunner(Pipeline resource, Context<Pipeline> context, String ns) {
+        final Job desiredJob = makeDesiredSinkDeployment(resource, ns,
                 CONFIG_MAP_NAME);
         try {
             Job existingJob = context.getSecondaryResource(Job.class).orElse(null);

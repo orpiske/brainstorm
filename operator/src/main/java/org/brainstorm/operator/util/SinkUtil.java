@@ -68,13 +68,11 @@ public final class SinkUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", sinkRoutePath(),
-                        "--consumes-from", TopicGenerator.getInstance().currentStepTopic(),
+                        "--consumes-from", TopicNameGenerator.getInstance().current(),
                         "--wait"));
     }
 
-    public static Job makeDesiredSinkDeployment(
-            Pipeline pipeline, String deploymentName, String ns,
-            String configMapName) {
+    public static Job makeDesiredSinkDeployment(Pipeline pipeline, String ns, String configMapName) {
         Job desiredJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);
 

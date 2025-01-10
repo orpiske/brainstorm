@@ -17,28 +17,31 @@
 
 package org.brainstorm.operator.util;
 
-public final class TopicGenerator {
+public final class TopicNameGenerator implements NameGenerator{
     private static final String DATA_STEP_BASE_TOPIC = "data.step";
     private int last = 0;
 
-    private static TopicGenerator instance;
+    private static TopicNameGenerator instance;
 
-    public String currentStepTopic() {
+    @Override
+    public String current() {
         return String.format("%s.%02d", DATA_STEP_BASE_TOPIC, last);
     }
 
-    public String nextStepTopic() {
+    @Override
+    public String next() {
         last++;
         return String.format("%s.%02d", DATA_STEP_BASE_TOPIC, last);
     }
 
+    @Override
     public void reset() {
         last = 0;
     }
 
-    public static TopicGenerator getInstance() {
+    public static TopicNameGenerator getInstance() {
         if (instance == null) {
-            instance = new TopicGenerator();
+            instance = new TopicNameGenerator();
         }
 
         return instance;

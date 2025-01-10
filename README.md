@@ -131,13 +131,11 @@ spec:
     port: 9092
   sourceStep:
     image: quay.io/my-org/camel-source-runner-01:latest
-    producesTo: data.acquired
   transformationSteps:
     steps:
       - image: quay.io/my-org/runner-transformation-step-01
-        consumesFrom: data.acquired
-        producesTo: data.step.01
-        name: step-01
+  sinkStep:
+    image: quay.io/my-org/camel-sink-runner-01:latest
 ```
 
 Make sure to: 
@@ -165,10 +163,12 @@ After completion, you can verify their statuses using:
 
 ```shell
 [~]$ kubectl get jobs
-NAME                       STATUS     COMPLETIONS   DURATION   AGE
-my-sample-source      Complete   1/1           47s        7m27s
-step-01                    Complete   1/1           111s       7m27s
-step-02                    Complete   1/1           113s       7m27s
+NAME         STATUS     COMPLETIONS   DURATION   AGE
+sink-job     Complete   1/1           112s       2m4s
+source-job   Complete   1/1           45s        2m4s
+step-01      Complete   1/1           109s       2m4s
+step-02      Complete   1/1           111s       2m4s
+step-03      Complete   1/1           112s       2m4s
 ```
 
 **NOTE**: and, of course, you can read the pod logs for details and more. 

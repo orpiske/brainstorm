@@ -67,17 +67,17 @@ public final class TransformationUtil {
                 .setCommand(List.of("/opt/brainstorm/worker/run.sh",
                         "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
                         "--step", step,
-                        "--consumes-from", TopicGenerator.getInstance().currentStepTopic(),
-                        "--produces-to", TopicGenerator.getInstance().nextStepTopic()));
+                        "--consumes-from", TopicNameGenerator.getInstance().current(),
+                        "--produces-to", TopicNameGenerator.getInstance().next()));
     }
 
     public static Job makeDesiredTransformationJob(
-            Pipeline pipeline, String deploymentName, String ns,
+            Pipeline pipeline, String jobName, String ns,
             String configMapName, TransformationStep transformationStep) {
         Job desiredRunnerJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, RESOURCE_FILE);
 
-        desiredRunnerJob.getMetadata().setName(deploymentName);
+        desiredRunnerJob.getMetadata().setName(jobName);
         desiredRunnerJob.getMetadata().setNamespace(ns);
 
         final JobSpec runnerSpec = desiredRunnerJob.getSpec();

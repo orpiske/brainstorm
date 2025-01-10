@@ -12,9 +12,7 @@ spec:
   transformationSteps:
     steps:
       - image: docker.io/my-org/runner-transformer-step-01
-        name: step-01
-# Just add more and more steps as needed
+# Just add more and more steps as needed (the operator will take care of everything else)
 #      - image: docker.io/my-org/runner-worker-step-02
-#        name: step-02
   sinkStep:
     image: docker.io/my-org/camel-sink-runner-01:latest
