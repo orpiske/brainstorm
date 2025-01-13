@@ -22,18 +22,18 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.brainstorm</groupId>
-        <artifactId>workers</artifactId>
+        <artifactId>transformers</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <name>Brainstorm :: Workers :: Transformers :: Quarkus</name>
+    <artifactId>quarkus-transformer</artifactId>
     <packaging>pom</packaging>
-    <artifactId>transformers</artifactId>
-    <name>Brainstorm :: Workers :: Transformers</name>
 
     <modules>
-        <module>runner-transformer</module>
-        <module>camel-transformer</module>
-        <module>quarkus-transformer</module>
+        <module>quarkus-transformer-parent</module>
+        <module>quarkus-transformer-runtime</module>
+        <module>quarkus-transformer-events</module>
     </modules>
 
 </project>

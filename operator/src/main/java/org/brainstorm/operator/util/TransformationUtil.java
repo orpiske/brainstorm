@@ -21,6 +21,8 @@ import java.util.List;
 
 import io.fabric8.kubernetes.api.model.ConfigMapVolumeSourceBuilder;
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
@@ -63,12 +65,21 @@ public final class TransformationUtil {
 
         final String step = getTransformationStep(transformationStep);
 
-        runner
-                .setCommand(List.of("/opt/brainstorm/worker/run.sh",
-                        "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "--step", step,
-                        "--consumes-from", TopicNameGenerator.getInstance().current(),
-                        "--produces-to", TopicNameGenerator.getInstance().next()));
+        final List<EnvVar> envVars = buildEnvironment(pipeline, step);
+
+        runner.setEnv(envVars);
+    }
+
+    private static List<EnvVar> buildEnvironment(Pipeline pipeline, String step) {
+        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
+                .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
+        EnvVar bootstrapPort = new EnvVarBuilder().withName("BOOTSTRAP_PORT")
+                .withValue(String.valueOf(pipeline.getSpec().getPipelineInfra().getPort())).build();
+        EnvVar stepEnv = new EnvVarBuilder().withName("STEP").withValue(step).build();
+        EnvVar consumesFrom = new EnvVarBuilder().withName("CONSUMES_FROM").withValue(TopicNameGenerator.getInstance().current()).build();
+        EnvVar producesTo = new EnvVarBuilder().withName("PRODUCES_TO").withValue(TopicNameGenerator.getInstance().next()).build();
+
+        return List.of(bootstrapHost, bootstrapPort, stepEnv, consumesFrom, producesTo);
     }
 
     public static Job makeDesiredTransformationJob(

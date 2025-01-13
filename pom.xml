@@ -34,7 +34,6 @@
         <module>cli</module>
         <module>workers</module>
         <module>archetypes</module>
-
     </modules>
 
 </project>

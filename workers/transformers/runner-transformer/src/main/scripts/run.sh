@@ -18,4 +18,4 @@
 install_path=$(dirname $0)
 jar_file=runner-transformer-jar-with-dependencies.jar
 
-java -jar ${install_path}/${jar_file} "$@"
+java -jar ${install_path}/${jar_file} -s "${BOOTSTRAP_HOST}" --step "${STEP}" --consumes-from "${CONSUMES_FROM}" --produces-to "${PRODUCES_TO}"
