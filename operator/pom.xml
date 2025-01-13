@@ -68,19 +68,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache Maven Snapshots Repository</name>
-            <url>https://repository.apache.org/snapshots/</url>
-            <snapshots>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.brainstorm</groupId>
