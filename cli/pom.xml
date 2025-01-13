@@ -125,12 +125,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>jib-core</artifactId>
-            <version>${jib-core.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java</artifactId>
         </dependency>
