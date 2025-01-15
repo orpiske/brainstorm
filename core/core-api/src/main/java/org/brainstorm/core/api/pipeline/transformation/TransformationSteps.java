@@ -15,33 +15,26 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.source;
+package org.brainstorm.core.api.pipeline.transformation;
 
-public class SourceStep {
-    private String image;
-    private String producesTo;
+import java.util.ArrayList;
+import java.util.List;
 
-    public String getImage() {
-        return image;
+public class TransformationSteps {
+    private List<TransformationStep> steps = new ArrayList<>();
+
+    public List<TransformationStep> getSteps() {
+        return steps;
     }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getProducesTo() {
-        return producesTo;
-    }
-
-    public void setProducesTo(String producesTo) {
-        this.producesTo = producesTo;
+    public void setSteps(List<TransformationStep> steps) {
+        this.steps = steps;
     }
 
     @Override
     public String toString() {
-        return "SourceStep{" +
-                "image='" + image + '\'' +
-                ", producesTo='" + producesTo + '\'' +
+        return "Transformation{" +
+                "steps=" + steps +
                 '}';
     }
 }

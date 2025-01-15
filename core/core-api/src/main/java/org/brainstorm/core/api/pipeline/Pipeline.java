@@ -15,26 +15,36 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.source;
+package org.brainstorm.core.api.pipeline;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.brainstorm.core.api.pipeline.source.Source;
+import org.brainstorm.core.api.pipeline.transformation.TransformationSteps;
 
-public class Source {
-    private List<SourceStep> steps = new ArrayList<>();
+public class Pipeline {
+    private Source source;
+    private TransformationSteps transformation;
 
-    public List<SourceStep> getSteps() {
-        return steps;
+    public Source getSource() {
+        return source;
     }
 
-    public void setSteps(List<SourceStep> steps) {
-        this.steps = steps;
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
+    public TransformationSteps getTransformation() {
+        return transformation;
+    }
+
+    public void setTransformation(TransformationSteps transformation) {
+        this.transformation = transformation;
     }
 
     @Override
     public String toString() {
-        return "Source{" +
-                "steps=" + steps +
+        return "Pipeline{" +
+                "acquisition=" + source +
+                ", transformation=" + transformation +
                 '}';
     }
 }

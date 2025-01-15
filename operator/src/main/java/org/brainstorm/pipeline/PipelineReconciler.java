@@ -12,7 +12,7 @@ import io.fabric8.kubernetes.client.dsl.Replaceable;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
-import org.brainstorm.api.pipeline.transformation.TransformationStep;
+import org.brainstorm.core.api.pipeline.transformation.TransformationStep;
 import org.brainstorm.operator.util.StepNameGenerator;
 import org.brainstorm.operator.util.TopicNameGenerator;
 import org.jboss.logging.Logger;

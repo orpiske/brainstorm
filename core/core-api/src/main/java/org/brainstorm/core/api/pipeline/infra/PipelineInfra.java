@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.infra;
+package org.brainstorm.core.api.pipeline.infra;
 
 public class PipelineInfra {
     private String bootstrapServer;

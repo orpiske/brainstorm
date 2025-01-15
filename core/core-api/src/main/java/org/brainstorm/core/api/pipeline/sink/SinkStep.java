@@ -15,26 +15,33 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.transformation;
+package org.brainstorm.core.api.pipeline.sink;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SinkStep {
+    private String image;
+    private String consumesFrom;
 
-public class TransformationSteps {
-    private List<TransformationStep> steps = new ArrayList<>();
-
-    public List<TransformationStep> getSteps() {
-        return steps;
+    public String getImage() {
+        return image;
     }
 
-    public void setSteps(List<TransformationStep> steps) {
-        this.steps = steps;
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getConsumesFrom() {
+        return consumesFrom;
+    }
+
+    public void setConsumesFrom(String consumesFrom) {
+        this.consumesFrom = consumesFrom;
     }
 
     @Override
     public String toString() {
-        return "Transformation{" +
-                "steps=" + steps +
+        return "SinkStep{" +
+                "image='" + image + '\'' +
+                ", producesTo='" + consumesFrom + '\'' +
                 '}';
     }
 }

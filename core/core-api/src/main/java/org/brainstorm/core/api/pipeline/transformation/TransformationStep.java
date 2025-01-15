@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.brainstorm.api.pipeline.transformation;
+package org.brainstorm.core.api.pipeline.transformation;
 
 import java.util.Objects;
 

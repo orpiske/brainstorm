@@ -2,10 +2,10 @@ package org.brainstorm.pipeline;
 
 import java.util.Objects;
 
-import org.brainstorm.api.pipeline.source.SourceStep;
-import org.brainstorm.api.pipeline.infra.PipelineInfra;
-import org.brainstorm.api.pipeline.sink.SinkStep;
-import org.brainstorm.api.pipeline.transformation.TransformationSteps;
+import org.brainstorm.core.api.pipeline.source.SourceStep;
+import org.brainstorm.core.api.pipeline.infra.PipelineInfra;
+import org.brainstorm.core.api.pipeline.sink.SinkStep;
+import org.brainstorm.core.api.pipeline.transformation.TransformationSteps;
 
 public class PipelineSpec {
     private PipelineInfra pipelineInfra;

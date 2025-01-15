@@ -22,25 +22,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.brainstorm</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>core</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>core</artifactId>
-    <name>Brainstorm :: Core</name>
-    <packaging>pom</packaging>
+    <artifactId>core-api</artifactId>
+    <name>Brainstorm :: Core :: Core API</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <modules>
-        <module>core-api</module>
-        <module>core-util</module>
-        <module>core-camel</module>
-    </modules>
 
 </project>

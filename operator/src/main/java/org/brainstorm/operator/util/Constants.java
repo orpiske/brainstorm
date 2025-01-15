@@ -19,7 +19,7 @@ package org.brainstorm.operator.util;
 
 import java.io.File;
 
-import org.brainstorm.api.pipeline.transformation.TransformationStep;
+import org.brainstorm.core.api.pipeline.transformation.TransformationStep;
 
 /**
  * Common constants (i.e.: paths from the containers and stuff like that) along with a few
