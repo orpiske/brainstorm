@@ -57,6 +57,9 @@ public class CamelSourceMain implements Callable<Integer> {
     @CommandLine.Option(names = {"--wait"}, description = "Wait forever until a file is created", defaultValue = "false")
     private boolean waitForever;
 
+    @CommandLine.Option(names = {"--data-directory"}, description = "The data directory", required = true)
+    private String dataDirectory;
+
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
 
@@ -89,7 +92,8 @@ public class CamelSourceMain implements Callable<Integer> {
         CountDownLatch launchLatch = new CountDownLatch(1);
         try {
             context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
-            context.addRoutes(new DataAcquiredRoute(bootstrapServer, bootstrapPort, producesTo, Topics.ACQUISITION_EVENT));
+            context.addRoutes(new DataAcquiredRoute(bootstrapServer, bootstrapPort, producesTo, Topics.ACQUISITION_EVENT,
+                    dataDirectory));
             context.addRoutes(new PipelineEndRoute(Topics.ACQUISITION_EVENT));
 
             context.start();

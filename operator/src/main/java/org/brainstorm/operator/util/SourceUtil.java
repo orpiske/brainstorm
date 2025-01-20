@@ -72,6 +72,18 @@ public final class SourceUtil {
                         "--wait"));
     }
 
+    private static List<EnvVar> buildEnvironment(Pipeline pipeline, String step) {
+        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
+                .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
+        EnvVar bootstrapPort = new EnvVarBuilder().withName("BOOTSTRAP_PORT")
+                .withValue(String.valueOf(pipeline.getSpec().getPipelineInfra().getPort())).build();
+        EnvVar producesTo = new EnvVarBuilder().withName("PRODUCES_TO").withValue(TopicNameGenerator.getInstance().current()).build();
+
+        EnvVar dataDirectory = new EnvVarBuilder().withName("DATA_DIRECTORY").withValue(Constants.DATA_DIR).build();
+
+        return List.of(bootstrapHost, bootstrapPort, producesTo);
+    }
+
     public static Job makeDesiredSourceDeployment(Pipeline pipeline, String ns, String configMapName) {
         Job desiredJob =
                 ReconcilerUtils.loadYaml(Job.class, PipelineReconciler.class, TEMPLATE_FILE);

@@ -25,17 +25,20 @@ public class DataAcquiredRoute extends RouteBuilder {
     private final int bootstrapPort;
     private final String producesTo;
     private final String notifies;
+    private final String dataDirectory;
 
-    public DataAcquiredRoute(String bootstrapHost, int bootstrapPort, String producesTo, String notifies) {
+    public DataAcquiredRoute(String bootstrapHost, int bootstrapPort, String producesTo, String notifies, String dataDirectory) {
         this.bootstrapHost = bootstrapHost;
         this.bootstrapPort = bootstrapPort;
         this.producesTo = producesTo;
         this.notifies = notifies;
+        this.dataDirectory = dataDirectory;
     }
 
     @Override
     public void configure() {
         fromF("direct:%s", Topics.DATA_ACQUIRED)
+                .setHeader("DATA_DIRECTORY", constant(dataDirectory))
                 .toF("kafka:%s?brokers=%s:%d", producesTo , bootstrapHost, bootstrapPort)
                 .toF("direct:%s", notifies);
     }

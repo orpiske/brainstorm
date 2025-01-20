@@ -23,4 +23,8 @@ mainClass=org.brainstorm.source.camel.main.CamelSourceMain
 
 fullClassPath=$(for jarFile in ${WORKER_CP}/*.jar ; do echo "${jarFile}:" ; done)
 
-java -cp "${fullClassPath}""${install_path}"/${jar_file} ${mainClass} "$@"
+java -cp "${fullClassPath}""${install_path}"/${jar_file} ${mainClass} \
+    --boostrap-server "${BOOTSTRAP_HOST}" \
+    --boostrap-server-port "${BOOTSTRAP_PORT:-"9092"}" \
+    --produces-to "${PRODUCES_TO}" \
+    --data-directory "${DATA_DIRECTORY}"
