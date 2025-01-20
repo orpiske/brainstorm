@@ -29,7 +29,8 @@ public class DefaultEventController implements EventController {
     private static final Logger LOG = Logger.getLogger(DefaultEventController.class);
 
     @Override
-    public void handle(String event) {
+    public boolean handle(String event) {
         LOG.infof("Event received: %s", event);
+        return true;
     }
 }

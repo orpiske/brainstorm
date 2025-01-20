@@ -18,5 +18,5 @@
 package org.brainstorm.transformer.quarkus.event;
 
 public interface EventController {
-    void handle(String event);
+    boolean handle(String event);
 }

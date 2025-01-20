@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.ShutdownEvent;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -53,10 +54,6 @@ public class KafkaEndpoint {
 
     volatile boolean done = false;
 
-    public KafkaEndpoint() {
-        LOG.info("KafkaEndpoint created");
-    }
-
     public void run() {
         LOG.infof("Starting the event consumer");
         String topic = eventSource.getTopicName();
@@ -71,14 +68,26 @@ public class KafkaEndpoint {
         LOG.infof("Consumer done");
     }
 
-
     private void doPoll() {
-        while (!done) {
-            final ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofSeconds(1));
-            consumerRecords.forEach(record -> eventController.handle(record.value()));
+        try {
+            while (!done) {
+                final ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofSeconds(1));
+                consumerRecords.forEach(this::handleEvent);
+            }
+        } finally {
+            consumer.close();
+            Quarkus.asyncExit();
+        }
+    }
+
+    private void handleEvent(ConsumerRecord<String, String> record) {
+        LOG.infof("Handling event");
+        final boolean handled = eventController.handle(record.value());
+        if (!handled) {
+            LOG.warnf("The event wasn't handled successfully. Check the logs");
         }
         LOG.infof("Closing consumer");
-        consumer.close();
+        done = true;
     }
 
     public void terminate(@Observes ShutdownEvent ev) {
@@ -88,7 +97,6 @@ public class KafkaEndpoint {
 
         LOG.infof("Shutting down ... %s", ev);
         done = true;
-
 
         producer.close();
         executor.shutdown();
