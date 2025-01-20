@@ -30,6 +30,7 @@
     <artifactId>${name.toLowerCase()}-transformer</artifactId>
 
     <properties>
+        <maven.compiler.release>17</maven.compiler.release>
         <worker.main.class>org.brainstorm.transformer.${name.toLowerCase()}.main.${name}WorkerMain</worker.main.class>
     </properties>
 
