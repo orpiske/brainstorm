@@ -36,16 +36,8 @@ import picocli.CommandLine;
 public class CamelSourceMain implements Callable<Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(CamelSourceMain.class);
 
-    static class ExclusiveEntries {
-        @CommandLine.Option(names = {"--file"}, description = "The integration file to use", required = true)
-        private String file;
-
-        @CommandLine.Option(names = {"--directory"}, description = "A directory containing route files to execute", required = true)
-        private String directory;
-    }
-
-    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
-    ExclusiveEntries exclusiveEntries;
+    @CommandLine.Option(names = {"--file"}, description = "The integration file to use", required = true)
+    private String file;
 
     @CommandLine.Option(names = {"-d", "--dependencies"}, description = "The list of dependencies to include in runtime (comma-separated)")
     private String dependenciesList;
@@ -78,38 +70,21 @@ public class CamelSourceMain implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        if (exclusiveEntries.file != null) {
-            if (exclusiveEntries.file.contains("file://")) {
-                LOG.error("Invalid file {} (do not prefix with file://)", exclusiveEntries.file);
-                return 1;
-            }
-
-            if (!FileUtil.waitForFile(new File(exclusiveEntries.file), false, waitForever)) {
-                return 2;
-            }
-        } else {
-            if (!FileUtil.waitForFile(new File(exclusiveEntries.directory), false, waitForever)) {
-                return 2;
-            }
+        if (file.contains("file://")) {
+            LOG.error("Invalid file {} (do not prefix with file://)", file);
+            return 1;
         }
+
+        if (!FileUtil.waitForFile(new File(file), false, waitForever)) {
+            return 2;
+        }
+
 
         CamelContext context = new DefaultCamelContext();
         BrainstormRoutesLoader routesLoader = new BrainstormRoutesLoader(dependenciesList);
 
-        if (exclusiveEntries.file != null) {
-            routesLoader.loadRoute(context, "file://" + exclusiveEntries.file);
-        } else {
-            File directory = new File(exclusiveEntries.directory);
-            final String[] list = directory.list((dir, name) -> name.endsWith(".yaml"));
+        routesLoader.loadRoute(context, "file://" + file);
 
-            if (list != null) {
-                File routeFile = new File(exclusiveEntries.directory, list[0]);
-                routesLoader.loadRoute(context, "file://" + routeFile.getAbsolutePath());
-            } else {
-                LOG.warn("No YAML file is available in the directory");
-                return 3;
-            }
-        }
 
         CountDownLatch launchLatch = new CountDownLatch(1);
         try {
