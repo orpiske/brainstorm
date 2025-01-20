@@ -4,7 +4,7 @@ VERSION_TAG:=latest
 KUBECTL:=kubectl
 
 package:
-	mvn clean -Dquarkus.container-image.build=true -Dquarkus.container-image.registry=$(REGISTRY) -Dquarkus.container-image.group=$(ORGANIZATION) -Dquarkus.container-image.tag=$(VERSION_TAG) package
+	mvn clean -Dquarkus.container-image.build=true -Dquarkus.container-image.registry=$(REGISTRY) -Dquarkus.container-image.group=$(ORGANIZATION) -Dquarkus.container-image.tag=$(VERSION_TAG) install
 
 build: package
 	podman build -f workers/sources/camel-source/Dockerfile -t $(REGISTRY)/$(ORGANIZATION)/camel-source:$(VERSION_TAG) ./workers/sources/camel-source
