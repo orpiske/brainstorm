@@ -21,10 +21,13 @@ jar_file=camel-source-jar-with-dependencies.jar
 WORKER_CP=${WORKER_CP:-/opt/brainstorm/classpath/}
 mainClass=org.brainstorm.source.camel.main.CamelSourceMain
 
+echo "Running ..."
+
 fullClassPath=$(for jarFile in ${WORKER_CP}/*.jar ; do echo "${jarFile}:" ; done)
 
 java -cp "${fullClassPath}""${install_path}"/${jar_file} ${mainClass} \
-    --boostrap-server "${BOOTSTRAP_HOST}" \
-    --boostrap-server-port "${BOOTSTRAP_PORT:-"9092"}" \
+    --bootstrap-server "${BOOTSTRAP_HOST}" \
+    --bootstrap-server-port "${BOOTSTRAP_PORT:-9092}" \
     --produces-to "${PRODUCES_TO}" \
-    --data-directory "${DATA_DIRECTORY}"
+    --data-directory "${DATA_DIRECTORY}" \
+    --file "${SOURCE_ROUTE_PATH}"

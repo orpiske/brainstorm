@@ -17,7 +17,9 @@
 
 package org.brainstorm.source.camel.routes;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.brainstorm.api.event.DataAcquired;
 import org.brainstorm.source.camel.common.Topics;
 
 public class DataAcquiredRoute extends RouteBuilder {
@@ -35,11 +37,33 @@ public class DataAcquiredRoute extends RouteBuilder {
         this.dataDirectory = dataDirectory;
     }
 
+    public void process(Exchange exchange) {
+        DataAcquired dataAcquired = new DataAcquired();
+
+        final String name = exchange.getMessage().getHeader("name", String.class);
+        final String address = exchange.getMessage().getHeader("SOURCE_ADDRESS", String.class);
+        final String dataDir = exchange.getMessage().getHeader("DATA_DIRECTORY", String.class);
+
+        dataAcquired.setName(name);
+        dataAcquired.setAddress(address);
+        dataAcquired.setPath(dataDir);
+
+        exchange.getMessage().setBody(dataAcquired);
+    }
+
     @Override
     public void configure() {
+        fromF("timer:startTimer?period=1000&repeatCount=1")
+            .routeId("DataAcquiredRoute")
+            .setHeader("DATA_DIRECTORY", constant(dataDirectory))
+            .to("direct:data.start");
+
+
         fromF("direct:%s", Topics.DATA_ACQUIRED)
-                .setHeader("DATA_DIRECTORY", constant(dataDirectory))
+                .process(this::process)
+                .marshal().json()
                 .toF("kafka:%s?brokers=%s:%d", producesTo , bootstrapHost, bootstrapPort)
-                .toF("direct:%s", notifies);
+                .toF("direct:%s", notifies)
+                .log("Data acquired");
     }
 }

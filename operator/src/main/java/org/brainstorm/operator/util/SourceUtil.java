@@ -61,18 +61,12 @@ public final class SourceUtil {
         LOG.infof("Building a new pipeline container using %s", image);
         runner.setImage(image);
 
-        EnvVar dataDir = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
-        runner.setEnv(List.of(dataDir));
+        final List<EnvVar> envVars = buildEnvironment(pipeline);
 
-        runner
-                .setCommand(List.of("/opt/brainstorm/worker/run.sh",
-                        "-s", pipeline.getSpec().getPipelineInfra().getBootstrapServer(),
-                        "--file", sourceRoutePath(),
-                        "--produces-to", TopicNameGenerator.getInstance().current(),
-                        "--wait"));
+        runner.setEnv(envVars);
     }
 
-    private static List<EnvVar> buildEnvironment(Pipeline pipeline, String step) {
+    private static List<EnvVar> buildEnvironment(Pipeline pipeline) {
         EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
                 .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
         EnvVar bootstrapPort = new EnvVarBuilder().withName("BOOTSTRAP_PORT")
@@ -80,8 +74,10 @@ public final class SourceUtil {
         EnvVar producesTo = new EnvVarBuilder().withName("PRODUCES_TO").withValue(TopicNameGenerator.getInstance().current()).build();
 
         EnvVar dataDirectory = new EnvVarBuilder().withName("DATA_DIRECTORY").withValue(Constants.DATA_DIR).build();
+        EnvVar workerCp = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
+        EnvVar routePath = new EnvVarBuilder().withName("SOURCE_ROUTE_PATH").withValue(sourceRoutePath()).build();
 
-        return List.of(bootstrapHost, bootstrapPort, producesTo);
+        return List.of(bootstrapHost, bootstrapPort, producesTo, dataDirectory, workerCp, routePath);
     }
 
     public static Job makeDesiredSourceDeployment(Pipeline pipeline, String ns, String configMapName) {
