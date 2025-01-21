@@ -28,7 +28,6 @@ import org.brainstorm.core.camel.common.BrainstormRoutesLoader;
 import org.brainstorm.core.util.io.FileUtil;
 import org.brainstorm.sink.camel.routes.DataCompletedRoute;
 import org.brainstorm.source.camel.common.processors.ShutdownProcessor;
-import org.brainstorm.source.camel.common.routes.NotifyingPipelineEndRoute;
 import org.brainstorm.source.camel.common.routes.PipelineEndRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
