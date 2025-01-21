@@ -1,37 +1,12 @@
 package org.brainstorm.api.event;
 
+import java.util.Objects;
+
 import org.brainstorm.api.common.Header;
 
 @SuppressWarnings("unused")
-public class DataAcquired {
-    private Header header;
-    private String name;
-    private String address;
+public class DataAcquired extends DataEvent {
     private String path;
-
-    public Header getHeader() {
-        return header;
-    }
-
-    public void setHeader(Header header) {
-        this.header = header;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public String getPath() {
         return path;
@@ -42,12 +17,26 @@ public class DataAcquired {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        DataAcquired that = (DataAcquired) o;
+        return Objects.equals(path, that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), path);
+    }
+
+    @Override
     public String toString() {
         return "DataAcquired{" +
-                "header=" + header +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", path='" + path + '\'' +
-                '}';
+                "path='" + path + '\'' +
+                "} " + super.toString();
     }
 }

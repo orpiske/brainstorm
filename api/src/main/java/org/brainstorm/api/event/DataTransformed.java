@@ -1,38 +1,13 @@
 package org.brainstorm.api.event;
 
+import java.util.Objects;
+
 import org.brainstorm.api.common.Header;
 
 @SuppressWarnings("unused")
-public class DataTransformed {
-    private Header header;
-    private String name;
-    private String address;
+public class DataTransformed extends DataEvent {
     private String inputPath;
     private String outputPath;
-
-    public Header getHeader() {
-        return header;
-    }
-
-    public void setHeader(Header header) {
-        this.header = header;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public String getInputPath() {
         return inputPath;
@@ -51,13 +26,27 @@ public class DataTransformed {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        DataTransformed that = (DataTransformed) o;
+        return Objects.equals(inputPath, that.inputPath) && Objects.equals(outputPath, that.outputPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), inputPath, outputPath);
+    }
+
+    @Override
     public String toString() {
         return "DataTransformed{" +
-                "header=" + header +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", inputPath='" + inputPath + '\'' +
+                "inputPath='" + inputPath + '\'' +
                 ", outputPath='" + outputPath + '\'' +
-                '}';
+                "} " + super.toString();
     }
 }
