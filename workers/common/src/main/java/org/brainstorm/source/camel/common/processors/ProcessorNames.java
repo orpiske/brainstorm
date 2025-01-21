@@ -15,24 +15,10 @@
  * limitations under the License.
  */
 
-package org.brainstorm.source.camel.common.routes;
+package org.brainstorm.source.camel.common.processors;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.brainstorm.source.camel.common.processors.ProcessorNames;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public final class ProcessorNames {
 
-public class PipelineEndRoute extends RouteBuilder {
-    private static final Logger LOG = LoggerFactory.getLogger(PipelineEndRoute.class);
-    private final String consumesFrom;
-
-    public PipelineEndRoute(String consumesFrom) {
-        this.consumesFrom = consumesFrom;
-    }
-
-    @Override
-    public void configure() throws Exception {
-        fromF("direct:%s", consumesFrom)
-                .process(ProcessorNames.ON_DATA_PROCESSED);
-    }
+    public static final String ON_DATA_PROCESSED = "onDataProcessed";
+    public static final String ON_DATA_CONSUMED = "onDataConsumed";
 }

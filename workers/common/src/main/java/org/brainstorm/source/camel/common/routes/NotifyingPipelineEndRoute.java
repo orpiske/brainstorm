@@ -18,12 +18,12 @@
 package org.brainstorm.source.camel.common.routes;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NotifyingPipelineEndRoute extends RouteBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(NotifyingPipelineEndRoute.class);
-    public static final String PROCESSOR = "onDataProcessed";
     private final String bootstrapHost;
     private final int bootstrapPort;
     private final String consumesFrom;
@@ -40,6 +40,6 @@ public class NotifyingPipelineEndRoute extends RouteBuilder {
     public void configure() throws Exception {
         fromF("direct:%s", consumesFrom)
                 .toF("kafka:%s?brokers=%s:%d", notifies, bootstrapHost, bootstrapPort)
-                .process(PROCESSOR);
+                .process(ProcessorNames.ON_DATA_PROCESSED);
     }
 }

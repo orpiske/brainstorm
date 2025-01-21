@@ -24,10 +24,10 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.brainstorm.source.camel.common.Topics;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.brainstorm.source.camel.common.processors.ShutdownProcessor;
 import org.brainstorm.source.camel.common.routes.NotifyingPipelineEndRoute;
 import org.brainstorm.source.camel.common.routes.PipelineStepRoute;
-import org.brainstorm.source.camel.common.routes.PipelineEndRoute;
 import org.brainstorm.transformer.runner.processors.ExecProcessProcessor;
 import org.brainstorm.source.camel.common.routes.PipelineStartRoute;
 import org.slf4j.Logger;
@@ -69,8 +69,8 @@ public class RunnerWorkerMain implements Callable<Integer> {
         CountDownLatch launchLatch = new CountDownLatch(1);
 
         String script = Paths.get(step, DEFAULT_SCRIPT_NAME).toAbsolutePath().toString();
-        context.getRegistry().bind(PipelineStepRoute.PROCESSOR, new ExecProcessProcessor(script));
-        context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
+        context.getRegistry().bind(ProcessorNames.ON_DATA_CONSUMED, new ExecProcessProcessor(script));
+        context.getRegistry().bind(ProcessorNames.ON_DATA_PROCESSED, new ShutdownProcessor(launchLatch));
 
         context.addRoutes(new PipelineStartRoute(bootstrapServer, bootstrapPort, consumesFrom, Topics.EVENT_DATA_CONSUMED));
         context.addRoutes(new PipelineStepRoute(Topics.EVENT_DATA_CONSUMED, Topics.EVENT_DATA_READY));

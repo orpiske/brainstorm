@@ -27,6 +27,7 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.brainstorm.core.camel.common.BrainstormRoutesLoader;
 import org.brainstorm.core.util.io.FileUtil;
 import org.brainstorm.sink.camel.routes.DataCompletedRoute;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.brainstorm.source.camel.common.processors.ShutdownProcessor;
 import org.brainstorm.source.camel.common.routes.PipelineEndRoute;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ public class CamelSinkMain implements Callable<Integer> {
         CountDownLatch launchLatch = new CountDownLatch(1);
         try {
             context.addRoutes(new DataCompletedRoute(bootstrapServer, bootstrapPort, consumesFrom, "data-completed"));
-            context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
+            context.getRegistry().bind(ProcessorNames.ON_DATA_PROCESSED, new ShutdownProcessor(launchLatch));
             context.addRoutes(new PipelineEndRoute("end-of-pipeline"));
 
             context.start();

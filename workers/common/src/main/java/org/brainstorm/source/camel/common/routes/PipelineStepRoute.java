@@ -18,12 +18,12 @@
 package org.brainstorm.source.camel.common.routes;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PipelineStepRoute extends RouteBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineStepRoute.class);
-    public static final String PROCESSOR = "onDataConsumed";
     private final String consumesFrom;
     private final String producesTo;
 
@@ -35,7 +35,7 @@ public class PipelineStepRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         fromF("direct:%s", consumesFrom)
-                .process(PROCESSOR)
+                .process(ProcessorNames.ON_DATA_CONSUMED)
                 .toF("direct:%s", producesTo);
     }
 }

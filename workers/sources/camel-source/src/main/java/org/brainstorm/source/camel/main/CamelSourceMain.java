@@ -26,6 +26,7 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.brainstorm.core.camel.common.BrainstormRoutesLoader;
 import org.brainstorm.core.util.io.FileUtil;
 import org.brainstorm.source.camel.common.Topics;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.brainstorm.source.camel.common.processors.ShutdownProcessor;
 import org.brainstorm.source.camel.common.routes.PipelineEndRoute;
 import org.brainstorm.source.camel.routes.DataAcquiredRoute;
@@ -91,7 +92,7 @@ public class CamelSourceMain implements Callable<Integer> {
 
         CountDownLatch launchLatch = new CountDownLatch(1);
         try {
-            context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
+            context.getRegistry().bind(ProcessorNames.ON_DATA_PROCESSED, new ShutdownProcessor(launchLatch));
             context.addRoutes(new DataAcquiredRoute(bootstrapServer, bootstrapPort, producesTo, Topics.ACQUISITION_EVENT,
                     dataDirectory));
             context.addRoutes(new PipelineEndRoute(Topics.ACQUISITION_EVENT));

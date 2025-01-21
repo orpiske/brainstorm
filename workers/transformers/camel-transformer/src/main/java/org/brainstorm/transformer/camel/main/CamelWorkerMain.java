@@ -17,7 +17,6 @@
 
 package org.brainstorm.transformer.camel.main;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
@@ -27,9 +26,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.brainstorm.core.camel.common.BrainstormRoutesLoader;
 import org.brainstorm.core.util.io.FileUtil;
+import org.brainstorm.source.camel.common.processors.ProcessorNames;
 import org.brainstorm.source.camel.common.processors.ShutdownProcessor;
 import org.brainstorm.source.camel.common.routes.NotifyingPipelineEndRoute;
-import org.brainstorm.source.camel.common.routes.PipelineEndRoute;
 import org.brainstorm.source.camel.common.routes.PipelineStartRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class CamelWorkerMain implements Callable<Integer> {
         CountDownLatch launchLatch = new CountDownLatch(1);
         try {
             context.addRoutes(new PipelineStartRoute(bootstrapServer, bootstrapPort, consumesFrom, "start-transformation"));
-            context.getRegistry().bind(PipelineEndRoute.PROCESSOR, new ShutdownProcessor(launchLatch));
+            context.getRegistry().bind(ProcessorNames.ON_DATA_PROCESSED, new ShutdownProcessor(launchLatch));
             context.addRoutes(new NotifyingPipelineEndRoute(bootstrapServer, bootstrapPort, "end-transformation", producesTo));
 
             context.start();
