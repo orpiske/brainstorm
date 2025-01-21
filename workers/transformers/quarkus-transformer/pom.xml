@@ -32,8 +32,8 @@
 
     <modules>
         <module>quarkus-transformer-parent</module>
-        <module>quarkus-transformer-runtime</module>
         <module>quarkus-transformer-events</module>
+        <module>quarkus-transformer-runtime</module>
     </modules>
 
 </project>

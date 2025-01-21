@@ -28,8 +28,14 @@
     </parent>
 
     <artifactId>quarkus-transformer-events</artifactId>
+    <name>Brainstorm :: Workers :: Transformers :: Quarkus :: Events</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>

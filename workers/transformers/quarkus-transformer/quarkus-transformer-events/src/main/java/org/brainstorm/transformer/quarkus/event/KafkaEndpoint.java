@@ -32,6 +32,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -56,7 +57,7 @@ public class KafkaEndpoint {
 
     public void run() {
         LOG.infof("Starting the event consumer");
-        String topic = eventSource.getTopicName();
+        String topic = eventSource.getConsumesFrom();
 
         LOG.infof("Consuming from topic: %s", topic);
 
@@ -75,19 +76,27 @@ public class KafkaEndpoint {
                 consumerRecords.forEach(this::handleEvent);
             }
         } finally {
+            LOG.infof("Closing consumer");
             consumer.close();
             Quarkus.asyncExit();
         }
     }
 
     private void handleEvent(ConsumerRecord<String, String> record) {
-        LOG.infof("Handling event");
-        final boolean handled = eventController.handle(record.value());
-        if (!handled) {
-            LOG.warnf("The event wasn't handled successfully. Check the logs");
+        try {
+            LOG.infof("Handling event");
+            final boolean handled = eventController.handle(record.value());
+            if (!handled) {
+                LOG.warnf("The event wasn't handled successfully. Check the logs");
+            }
+            LOG.infof("Broadcasting original event ...");
+            ProducerRecord<String, String> producerRecord =
+                    new ProducerRecord<>(eventSource.getProducesTo(), record.key(), record.value());
+
+            producer.send(producerRecord);
+        } finally {
+            done = true;
         }
-        LOG.infof("Closing consumer");
-        done = true;
     }
 
     public void terminate(@Observes ShutdownEvent ev) {

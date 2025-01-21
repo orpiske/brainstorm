@@ -17,19 +17,19 @@
 
 package org.brainstorm.transformer.quarkus.event;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Singleton;
 
 @Singleton
 public class EventSource {
 
-    String topicName;
+    String consumesFrom;
+    String producesTo;
     String bootstrapServers;
     String bootstrapServerPort;
     boolean isHelpOnly;
 
-    public String getTopicName() {
-        return topicName;
+    public String getConsumesFrom() {
+        return consumesFrom;
     }
 
     public String getBootstrapServers() {
@@ -40,8 +40,8 @@ public class EventSource {
         return bootstrapServerPort;
     }
 
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
+    public void setConsumesFrom(String consumesFrom) {
+        this.consumesFrom = consumesFrom;
     }
 
     public void setBootstrapServers(String bootstrapServers) {
@@ -58,5 +58,13 @@ public class EventSource {
 
     public void setHelpOnly(boolean helpOnly) {
         isHelpOnly = helpOnly;
+    }
+
+    public String getProducesTo() {
+        return producesTo;
+    }
+
+    public void setProducesTo(String producesTo) {
+        this.producesTo = producesTo;
     }
 }

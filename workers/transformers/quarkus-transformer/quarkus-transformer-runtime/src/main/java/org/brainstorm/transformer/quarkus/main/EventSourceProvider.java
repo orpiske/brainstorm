@@ -41,12 +41,13 @@ public class EventSourceProvider {
         if (!parseResult.isUsageHelpRequested()) {
             String bootstrapHost = parseResult.matchedOption("bootstrap-server").getValue().toString();
             int bootstrapPort = parseResult.matchedOptionValue("bootstrap-server-port", 9092);
-            String topic = parseResult.matchedOption("consumes-from").getValue().toString();
-
+            String consumesFrom = parseResult.matchedOption("consumes-from").getValue().toString();
+            String producesTo = parseResult.matchedOption("produces-to").getValue().toString();
 
             eventSource.setBootstrapServers(bootstrapHost);
             eventSource.setBootstrapServerPort(String.valueOf(bootstrapPort));
-            eventSource.setTopicName(topic);
+            eventSource.setConsumesFrom(consumesFrom);
+            eventSource.setProducesTo(producesTo);
 
             return eventSource;
         }
