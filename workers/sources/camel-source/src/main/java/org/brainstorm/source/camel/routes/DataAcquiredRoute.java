@@ -28,6 +28,7 @@ public class DataAcquiredRoute extends RouteBuilder {
     private final String producesTo;
     private final String notifies;
     private final String dataDirectory;
+    private final int delay = 10000;
 
     public DataAcquiredRoute(String bootstrapHost, int bootstrapPort, String producesTo, String notifies, String dataDirectory) {
         this.bootstrapHost = bootstrapHost;
@@ -53,7 +54,7 @@ public class DataAcquiredRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-        fromF("timer:startTimer?period=1000&repeatCount=1")
+        fromF("timer:startTimer?delay=%d&repeatCount=1", delay)
             .routeId("DataAcquiredRoute")
             .setHeader("DATA_DIRECTORY", constant(dataDirectory))
             .to("direct:data.start");
