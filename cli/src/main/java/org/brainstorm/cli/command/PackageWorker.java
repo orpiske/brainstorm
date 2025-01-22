@@ -1,7 +1,13 @@
 package org.brainstorm.cli.command;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Properties;
+import java.util.Set;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -16,11 +22,9 @@ import picocli.CommandLine;
 public abstract class PackageWorker extends BaseCommand {
     private static final Logger LOG = Logger.getLogger(PackageWorker.class);
 
-    @CommandLine.Option(names = {"--username"}, description = "The username for the registry", arity = "0..1")
-    protected String username;
-
-    @CommandLine.Option(names = {"--password"}, description = "The password for the registry", interactive = true, arity = "0..1")
-    protected String password;
+    @CommandLine.Option(names = {"--credentials"}, description = "The path to the properties file containing the credentials to use", defaultValue = "${user.home}/.brainstorm/cli/credentials.properties",
+            arity = "0..1")
+    protected String credentialsPath;
 
     @CommandLine.Option(names = { "--base-dir" }, description = "The base dir containing the dockerfile and artifacts to build the container", arity = "0..1")
     private String baseDir;
@@ -38,7 +42,26 @@ public abstract class PackageWorker extends BaseCommand {
         buildDockerfile();
     }
 
+    private Properties loadProperties() {
+        Properties props = new Properties();
+
+        try (InputStream in = new FileInputStream(credentialsPath)) {
+            props.load(in);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return props;
+    }
+
     private void buildDockerfile() {
+        Properties props = loadProperties();
+
+        String username = props.getProperty("registry.username");
+        String password = props.getProperty("registry.password");
+
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withRegistryUsername(username)
                 .withRegistryPassword(password)
@@ -71,7 +94,7 @@ public abstract class PackageWorker extends BaseCommand {
                 .withPull(true)
                 .withBaseDirectory(dockerfile.getParentFile())
                 .withNoCache(false)
-                .withTag(outputImage)
+                .withTags(Set.of(outputImage))
                 .exec(new BuildImageResultCallback())
                 .awaitImageId();
 
