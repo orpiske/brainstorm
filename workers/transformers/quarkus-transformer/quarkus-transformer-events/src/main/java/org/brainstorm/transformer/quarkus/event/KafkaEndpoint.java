@@ -19,8 +19,11 @@ package org.brainstorm.transformer.quarkus.event;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -38,6 +41,7 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public class KafkaEndpoint {
     private static final Logger LOG = Logger.getLogger(KafkaEndpoint.class);
+    public static final int TIMEOUT = 10;
 
     @Inject
     KafkaConsumer<String, String> consumer;
@@ -89,11 +93,20 @@ public class KafkaEndpoint {
             if (!handled) {
                 LOG.warnf("The event wasn't handled successfully. Check the logs");
             }
-            LOG.infof("Broadcasting original event ...");
+            LOG.infof("Broadcasting original event to %s", eventSource.getProducesTo());
             ProducerRecord<String, String> producerRecord =
                     new ProducerRecord<>(eventSource.getProducesTo(), record.key(), record.value());
 
-            producer.send(producerRecord);
+            try {
+                producer.send(producerRecord).get(TIMEOUT, TimeUnit.SECONDS);
+                LOG.infof("Done broadcasting original event to %s", eventSource.getProducesTo());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
+            }
         } finally {
             done = true;
         }
