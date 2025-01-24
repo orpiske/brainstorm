@@ -25,12 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.brainstorm.cli.common.CredentialsHelper;
 import org.brainstorm.cli.common.ImageBuilder;
 import org.brainstorm.cli.types.project.PipelineProject;
 import org.brainstorm.cli.types.project.Transformation;
-import org.brainstorm.cli.util.ProcessRunner;
+import org.brainstorm.cli.util.ProjectHelper;
 import org.jboss.logging.Logger;
 import picocli.CommandLine;
 
@@ -48,19 +47,17 @@ public class ProjectBuild extends BaseCommand {
 
     @Override
     public void run() {
-        final File projectDir = new File(path);
-        File file = new File(projectDir, "brainstorm.json");
-
-        ObjectMapper mapper = new ObjectMapper();
+        
         try {
-            final PipelineProject project = mapper.readValue(file, PipelineProject.class);
+            final File projectDir = new File(path);
+            final PipelineProject project = ProjectHelper.loadProject(projectDir);
 
             final String organizationName = project.getOrganization().getName();
             final String registryName = project.getRegistry().getName();
             final String version = project.getVersion();
 
-            cleanProject(project, organizationName, registryName, version, file);
-            buildProject(project, organizationName, registryName, version, file);
+            cleanProject(project, organizationName, registryName, version, projectDir);
+            buildProject(project, organizationName, registryName, version, projectDir);
 
             ImageBuilder imageBuilder = new ImageBuilder(CredentialsHelper.loadProperties(credentialsPath));
 
@@ -138,24 +135,15 @@ public class ProjectBuild extends BaseCommand {
     }
 
     private static void cleanProject(
-            PipelineProject project, String organizationName, String registryName, String version, File file) {
+            PipelineProject project, String organizationName, String registryName, String version, File projectDir) {
         final String commandStr = project.getCode().getLifecycle().getClean().getCommand();
-        String command = commandStr.replace("%organizationName%", organizationName)
-                .replace("%registryName%", registryName)
-                .replace("%version%", version);
-        LOG.infof("About to run clean command: {}", command);
-        ProcessRunner.run(file.getParentFile(), command.split(" "));
+        ProjectHelper.runCommandOnProject(organizationName, registryName, version, projectDir, commandStr);
     }
 
     private static void buildProject(
-            PipelineProject project, String organizationName, String registryName, String version, File file) {
+            PipelineProject project, String organizationName, String registryName, String version, File projectDir) {
         final String commandStr = project.getCode().getLifecycle().getBuild().getCommand();
-        String command = commandStr.replace("%organizationName%", organizationName)
-                .replace("%registryName%", registryName)
-                .replace("%version%", version);
-        LOG.infof("About to run build command: {}", command);
-        ProcessRunner.run(file.getParentFile(), command.split(" "));
+        ProjectHelper.runCommandOnProject(organizationName, registryName, version, projectDir, commandStr);
     }
-
 
 }
