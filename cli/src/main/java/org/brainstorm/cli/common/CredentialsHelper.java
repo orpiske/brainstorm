@@ -15,33 +15,27 @@
  * limitations under the License.
  */
 
-package org.brainstorm.service.util;
+package org.brainstorm.cli.common;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-import org.jboss.logging.Logger;
+public class CredentialsHelper {
 
-public class ProcessRunner {
-    private static final Logger LOG = Logger.getLogger(ProcessRunner.class);
+    public static Properties loadProperties(String credentialsPath) {
+        Properties props = new Properties();
 
-    public static void run(String...command) {
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(command);
-            processBuilder.inheritIO();
-
-            final Process process = processBuilder.start();
-            LOG.info("Waiting for process to finish...");
-            final int i = process.waitFor();
-            if (i != 0) {
-                LOG.warn("Process did execute successfully");
-            }
-        } catch (IOException e) {
-            LOG.error("I/O Error: %s", e.getMessage(), e);
+        try (InputStream in = new FileInputStream(credentialsPath)) {
+            props.load(in);
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            LOG.error("Interrupted: %s", e.getMessage(), e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return props;
     }
 }

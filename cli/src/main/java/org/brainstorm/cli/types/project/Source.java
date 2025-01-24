@@ -15,15 +15,36 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.cli.types.project;
 
-import picocli.CommandLine;
+import java.util.List;
 
-@CommandLine.Command(name = "project",
-        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class})
-public class Project extends BaseCommand {
-    @Override
-    public void run() {
+public class Source {
+    private List<String> artifacts;
+    private String file;
+    private Image image;
 
+    public List<String> getArtifacts() {
+        return artifacts;
+    }
+
+    public void setArtifacts(List<String> artifacts) {
+        this.artifacts = artifacts;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 }

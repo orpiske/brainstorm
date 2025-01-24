@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.cli.types.project;
 
-import picocli.CommandLine;
+public class Transformation {
+    private String name;
 
-@CommandLine.Command(name = "project",
-        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class})
-public class Project extends BaseCommand {
-    @Override
-    public void run() {
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
     }
 }

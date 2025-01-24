@@ -15,15 +15,34 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.cli.types.project;
 
-import picocli.CommandLine;
+public class Lifecycle {
+    private Context context;
+    private Build build;
+    private Clean clean;
 
-@CommandLine.Command(name = "project",
-        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class})
-public class Project extends BaseCommand {
-    @Override
-    public void run() {
+    public Context getContext() {
+        return context;
+    }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public Build getBuild() {
+        return build;
+    }
+
+    public void setBuild(Build build) {
+        this.build = build;
+    }
+
+    public Clean getClean() {
+        return clean;
+    }
+
+    public void setClean(Clean clean) {
+        this.clean = clean;
     }
 }

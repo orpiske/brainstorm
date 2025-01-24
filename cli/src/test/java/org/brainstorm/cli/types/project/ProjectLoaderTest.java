@@ -15,15 +15,29 @@
  * limitations under the License.
  */
 
-package org.brainstorm.cli.command;
+package org.brainstorm.cli.types.project;
 
-import picocli.CommandLine;
+import java.io.IOException;
+import java.net.URL;
 
-@CommandLine.Command(name = "project",
-        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class})
-public class Project extends BaseCommand {
-    @Override
-    public void run() {
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+public class ProjectLoaderTest {
+
+    @Test
+    public void testLoadProject() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            final URL resource = getClass().getResource("/sample-project.json");
+            final PipelineProject pipelineProject =
+                    mapper.readValue(resource, PipelineProject.class);
+
+            Assertions.assertNotNull(pipelineProject);
+            Assertions.assertEquals(pipelineProject.getOrganization().getName(),"orpiske");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
