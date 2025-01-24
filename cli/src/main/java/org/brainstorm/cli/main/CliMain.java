@@ -40,6 +40,5 @@ public class CliMain implements Runnable, QuarkusApplication {
 
     @Override
     public void run() {
-        System.out.println("Running");
     }
 }
