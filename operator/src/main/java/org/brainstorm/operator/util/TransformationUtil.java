@@ -78,8 +78,10 @@ public final class TransformationUtil {
         EnvVar stepEnv = new EnvVarBuilder().withName("STEP").withValue(step).build();
         EnvVar consumesFrom = new EnvVarBuilder().withName("CONSUMES_FROM").withValue(TopicNameGenerator.getInstance().current()).build();
         EnvVar producesTo = new EnvVarBuilder().withName("PRODUCES_TO").withValue(TopicNameGenerator.getInstance().next()).build();
+        EnvVar dataDirectory = new EnvVarBuilder().withName("DATA_DIRECTORY").withValue(Constants.DATA_DIR).build();
 
-        return List.of(bootstrapHost, bootstrapPort, stepEnv, consumesFrom, producesTo);
+
+        return List.of(bootstrapHost, bootstrapPort, stepEnv, consumesFrom, producesTo, dataDirectory);
     }
 
     public static Job makeDesiredTransformationJob(
