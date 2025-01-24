@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.brainstorm.cli.command.ProjectBuild;
 import org.brainstorm.cli.types.project.PipelineProject;
 import org.jboss.logging.Logger;
 
@@ -30,6 +29,10 @@ public final class ProjectHelper {
     public static final String DEFAULT_PROJECT_FILE = "brainstorm.json";
 
     private ProjectHelper() {}
+
+    public static File getProjectFile(File baseDir) {
+        return new File(baseDir, DEFAULT_PROJECT_FILE);
+    }
 
     public static PipelineProject loadProject(File projectDir) throws IOException {
         File file = new File(projectDir, DEFAULT_PROJECT_FILE);

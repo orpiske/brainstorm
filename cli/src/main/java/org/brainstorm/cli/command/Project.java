@@ -20,7 +20,7 @@ package org.brainstorm.cli.command;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "project",
-        description = "Create a new brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class})
+        description = "Create or manage brainstorm project", sortOptions = false, subcommands = {ProjectNew.class, ProjectBuild.class, ProjectConfigure.class})
 public class Project extends BaseCommand {
     @Override
     public void run() {
