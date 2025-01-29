@@ -27,6 +27,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
 import org.brainstorm.core.api.pipeline.sink.SinkStep;
+import org.brainstorm.core.api.util.EnvironmentVariables;
 import org.brainstorm.pipeline.Pipeline;
 import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
@@ -61,7 +62,7 @@ public final class SinkUtil {
         LOG.infof("Building a new sink container using %s", image);
         runner.setImage(image);
 
-        EnvVar dataDir = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
+        EnvVar dataDir = new EnvVarBuilder().withName(EnvironmentVariables.WORKER_CP).withValue(classpathPath()).build();
         runner.setEnv(List.of(dataDir));
 
         runner

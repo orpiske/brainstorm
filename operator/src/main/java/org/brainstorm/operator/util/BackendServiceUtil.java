@@ -29,6 +29,7 @@ import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
+import org.brainstorm.core.api.util.EnvironmentVariables;
 import org.brainstorm.pipeline.Pipeline;
 import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
@@ -56,8 +57,8 @@ public final class BackendServiceUtil {
 
         service.setCommand(List.of("/opt/jboss/container/java/run/run-java.sh"));
 
-        EnvVar dataDir = new EnvVarBuilder().withName("DATA_DIR").withValue(DATA_DIR).build();
-        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
+        EnvVar dataDir = new EnvVarBuilder().withName(EnvironmentVariables.DATA_DIRECTORY).withValue(DATA_DIR).build();
+        EnvVar bootstrapHost = new EnvVarBuilder().withName(EnvironmentVariables.BOOTSTRAP_HOST)
                 .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
 
         service.setEnv(List.of(dataDir, bootstrapHost));

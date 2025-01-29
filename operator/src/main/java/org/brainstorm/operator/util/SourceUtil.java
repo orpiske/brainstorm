@@ -27,6 +27,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
 import org.brainstorm.core.api.pipeline.source.SourceStep;
+import org.brainstorm.core.api.util.EnvironmentVariables;
 import org.brainstorm.pipeline.Pipeline;
 import org.brainstorm.pipeline.PipelineReconciler;
 import org.jboss.logging.Logger;
@@ -67,15 +68,15 @@ public final class SourceUtil {
     }
 
     private static List<EnvVar> buildEnvironment(Pipeline pipeline) {
-        EnvVar bootstrapHost = new EnvVarBuilder().withName("BOOTSTRAP_HOST")
+        EnvVar bootstrapHost = new EnvVarBuilder().withName(EnvironmentVariables.BOOTSTRAP_HOST)
                 .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
-        EnvVar bootstrapPort = new EnvVarBuilder().withName("BOOTSTRAP_PORT")
+        EnvVar bootstrapPort = new EnvVarBuilder().withName(EnvironmentVariables.BOOTSTRAP_PORT)
                 .withValue(String.valueOf(pipeline.getSpec().getPipelineInfra().getPort())).build();
-        EnvVar producesTo = new EnvVarBuilder().withName("PRODUCES_TO").withValue(TopicNameGenerator.getInstance().current()).build();
+        EnvVar producesTo = new EnvVarBuilder().withName(EnvironmentVariables.PRODUCES_TO).withValue(TopicNameGenerator.getInstance().current()).build();
 
-        EnvVar dataDirectory = new EnvVarBuilder().withName("DATA_DIRECTORY").withValue(Constants.DATA_DIR).build();
-        EnvVar workerCp = new EnvVarBuilder().withName("WORKER_CP").withValue(classpathPath()).build();
-        EnvVar routePath = new EnvVarBuilder().withName("SOURCE_ROUTE_PATH").withValue(sourceRoutePath()).build();
+        EnvVar dataDirectory = new EnvVarBuilder().withName(EnvironmentVariables.DATA_DIRECTORY).withValue(Constants.DATA_DIR).build();
+        EnvVar workerCp = new EnvVarBuilder().withName(EnvironmentVariables.WORKER_CP).withValue(classpathPath()).build();
+        EnvVar routePath = new EnvVarBuilder().withName(EnvironmentVariables.SOURCE_ROUTE_PATH).withValue(sourceRoutePath()).build();
 
         return List.of(bootstrapHost, bootstrapPort, producesTo, dataDirectory, workerCp, routePath);
     }
