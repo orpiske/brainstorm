@@ -22,19 +22,35 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.brainstorm</groupId>
-        <artifactId>transformers</artifactId>
+        <artifactId>quarkus-transformer-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../quarkus-transformer-parent/pom.xml</relativePath>
     </parent>
 
-    <name>Brainstorm :: Workers :: Transformers :: Quarkus</name>
-    <artifactId>quarkus-transformer</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>quarkus-transformer-workflow</artifactId>
+    <name>Brainstorm :: Workers :: Transformers :: Quarkus :: Workflow</name>
 
-    <modules>
-        <module>quarkus-transformer-parent</module>
-        <module>quarkus-transformer-events</module>
-        <module>quarkus-transformer-runtime</module>
-        <module>quarkus-transformer-workflow</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.brainstorm</groupId>
+            <artifactId>core-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-core</artifactId>
+            <version>${quarkus.langchain.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

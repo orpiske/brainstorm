@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-package org.brainstorm.core.api.util;
+package org.brainstorm.transformer.quarkus.workflow.steps;
 
-public final class EnvironmentVariables {
-    public static final String BOOTSTRAP_HOST = "BOOTSTRAP_HOST";
-    public static final String BOOTSTRAP_PORT = "BOOTSTRAP_PORT";
-    public static final String STEP = "STEP";
-    public static final String CONSUMES_FROM = "CONSUMES_FROM";
-    public static final String PRODUCES_TO = "PRODUCES_TO";
-    public static final String DATA_DIRECTORY = "DATA_DIRECTORY";
-    public static final String WORKER_CP = "WORKER_CP";
-    public static final String SOURCE_ROUTE_PATH = "SOURCE_ROUTE_PATH";
+public class Step {
+    public static final Step CONTINUE = new Step(true);
+    public static final Step SKIP = new Step(false);
 
-    private EnvironmentVariables() {}
+    private final boolean next;
+
+    public Step(boolean next) {
+        this.next = next;
+    }
+
+    public boolean next() {
+        return next;
+    }
 }

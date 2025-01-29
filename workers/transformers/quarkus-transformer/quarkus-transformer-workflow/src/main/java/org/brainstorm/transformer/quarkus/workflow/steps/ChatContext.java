@@ -15,17 +15,39 @@
  * limitations under the License.
  */
 
-package org.brainstorm.core.api.util;
+package org.brainstorm.transformer.quarkus.workflow.steps;
 
-public final class EnvironmentVariables {
-    public static final String BOOTSTRAP_HOST = "BOOTSTRAP_HOST";
-    public static final String BOOTSTRAP_PORT = "BOOTSTRAP_PORT";
-    public static final String STEP = "STEP";
-    public static final String CONSUMES_FROM = "CONSUMES_FROM";
-    public static final String PRODUCES_TO = "PRODUCES_TO";
-    public static final String DATA_DIRECTORY = "DATA_DIRECTORY";
-    public static final String WORKER_CP = "WORKER_CP";
-    public static final String SOURCE_ROUTE_PATH = "SOURCE_ROUTE_PATH";
+/**
+ * Carries chat context, along with I/O payload
+ * @param <T>
+ * @param <V>
+ */
+public class ChatContext<T, V> {
+    private final String name;
+    private final T inputData;
+    private final V outputData;
+    private final String rawData;
 
-    private EnvironmentVariables() {}
+    public ChatContext(String name, T inputData, V outputData, String rawData) {
+        this.name = name;
+        this.inputData = inputData;
+        this.outputData = outputData;
+        this.rawData = rawData;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public T getInputData() {
+        return inputData;
+    }
+
+    public V getOutputData() {
+        return outputData;
+    }
+
+    public String getRawData() {
+        return rawData;
+    }
 }
