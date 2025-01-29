@@ -54,9 +54,6 @@
         <quarkus.container-image.tag>latest</quarkus.container-image.tag>
         <quarkus.container-image.build>false</quarkus.container-image.build>
         <quarkus.container-image.push>false</quarkus.container-image.push>
-
-        <snakeyaml.version>2.3</snakeyaml.version>
-        <quarkus-operator-sdk.version>6.9.1</quarkus-operator-sdk.version>
     </properties>
 
     <dependencyManagement>
