@@ -92,9 +92,13 @@ public class ProjectBuild extends BaseCommand {
                 String transformationNumber = String.format("%02d", i + 1);
 
                 File transformationDir = new File(transformationsDir, transformationNumber);
-                String transformationImage = transformation.getName();
+                if (transformationDir.exists()) {
+                    String transformationImage = transformation.getName();
 
-                images.put(transformationDir, transformationImage);
+                    images.put(transformationDir, transformationImage);
+                } else {
+                    LOG.infof("Skipping transformation %s because it does not exist (code based?)", transformationNumber);
+                }
             }
         }
         return images;
