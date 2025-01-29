@@ -17,6 +17,15 @@
 
 package org.brainstorm.transformer.quarkus.event;
 
+/**
+ * A controller to handle events from the pipeline bus
+ */
 public interface EventController {
+
+    /**
+     * Handles the event
+     * @param event the event to be handled
+     * @return true if it was handled successfully or false otherwise
+     */
     boolean handle(String event);
 }
