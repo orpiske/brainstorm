@@ -27,8 +27,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>archetype-worker-transformer</artifactId>
-    <name>Brainstorm :: Archetypes :: Worker Transformer</name>
+    <artifactId>archetype-quarkus-transformer</artifactId>
+    <name>Brainstorm :: Archetypes :: Quarkus Transformer</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

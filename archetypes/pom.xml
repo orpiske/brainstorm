@@ -37,6 +37,7 @@
 
     <modules>
         <module>archetype-worker-transformer</module>
+        <module>archetype-quarkus-transformer</module>
     </modules>
 
 </project>
