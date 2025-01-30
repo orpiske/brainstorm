@@ -17,6 +17,8 @@
 
 package org.brainstorm.operator.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.ConfigMapVolumeSourceBuilder;
@@ -26,6 +28,7 @@ import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.ReconcilerUtils;
+import org.brainstorm.core.api.pipeline.infra.PipelineInfra;
 import org.brainstorm.core.api.pipeline.transformation.TransformationStep;
 import org.brainstorm.core.api.pipeline.transformation.TransformationSteps;
 import org.brainstorm.core.api.util.EnvironmentVariables;
@@ -72,17 +75,39 @@ public final class TransformationUtil {
     }
 
     private static List<EnvVar> buildEnvironment(Pipeline pipeline, String step) {
+        ArrayList<EnvVar> envVars = new ArrayList<>();
         EnvVar bootstrapHost = new EnvVarBuilder().withName(EnvironmentVariables.BOOTSTRAP_HOST)
                 .withValue(pipeline.getSpec().getPipelineInfra().getBootstrapServer()).build();
+
+        envVars.add(bootstrapHost);
         EnvVar bootstrapPort = new EnvVarBuilder().withName(EnvironmentVariables.BOOTSTRAP_PORT)
                 .withValue(String.valueOf(pipeline.getSpec().getPipelineInfra().getPort())).build();
+        envVars.add(bootstrapPort);
+
         EnvVar stepEnv = new EnvVarBuilder().withName(EnvironmentVariables.STEP).withValue(step).build();
+        envVars.add(stepEnv);
         EnvVar consumesFrom = new EnvVarBuilder().withName(EnvironmentVariables.CONSUMES_FROM).withValue(TopicNameGenerator.getInstance().current()).build();
+        envVars.add(consumesFrom);
         EnvVar producesTo = new EnvVarBuilder().withName(EnvironmentVariables.PRODUCES_TO).withValue(TopicNameGenerator.getInstance().next()).build();
+        envVars.add(producesTo);
         EnvVar dataDirectory = new EnvVarBuilder().withName(EnvironmentVariables.DATA_DIRECTORY).withValue(Constants.DATA_DIR).build();
+        envVars.add(dataDirectory);
 
+        addGlobalEnvironmentVars(pipeline, envVars);
 
-        return List.of(bootstrapHost, bootstrapPort, stepEnv, consumesFrom, producesTo, dataDirectory);
+        return Collections.unmodifiableList(envVars);
+    }
+
+    private static void addGlobalEnvironmentVars(Pipeline pipeline, ArrayList<EnvVar> envVars) {
+        final PipelineInfra pipelineInfra = pipeline.getSpec().getPipelineInfra();
+        final List<String> environmentVariables = pipelineInfra.getEnvironmentVariables();
+        for (String pair : environmentVariables) {
+            final String[] split = pair.split("=");
+            if (split.length == 2) {
+                EnvVar env = new EnvVarBuilder().withName(split[0]).withValue(split[1]).build();
+                envVars.add(env);
+            }
+        }
     }
 
     public static Job makeDesiredTransformationJob(

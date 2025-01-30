@@ -17,9 +17,13 @@
 
 package org.brainstorm.core.api.pipeline.infra;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PipelineInfra {
     private String bootstrapServer;
     private int port;
+    private List<String> environmentVariables = new ArrayList<>();
 
     public String getBootstrapServer() {
         return bootstrapServer;
@@ -35,6 +39,14 @@ public class PipelineInfra {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public List<String> getEnvironmentVariables() {
+        return environmentVariables;
+    }
+
+    public void setEnvironmentVariables(List<String> environmentVariables) {
+        this.environmentVariables = environmentVariables;
     }
 
     @Override
