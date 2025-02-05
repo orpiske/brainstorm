@@ -72,12 +72,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-quarkus-extension</artifactId>
-                <version>${vaadin.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
