@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import org.brainstorm.transformer.quarkus.event.EventSource;
 import org.brainstorm.transformer.quarkus.event.KafkaEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +71,5 @@ public class QuarkusWorkerMain implements Runnable,QuarkusApplication {
         if (!helpRequested) {
             endpoint.run();
         }
-
     }
 }
